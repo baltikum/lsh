@@ -75,9 +75,10 @@ const char* extractpath(Command *cmd, int* isavailable) {
 
 		const char* retrievedpath = &savedpaths[i][0];
 
-		printf("%s\n",retrievedpath);
+		printf("Retreivedpath: %s\n",retrievedpath);
 
 		dir = opendir(retrievedpath); //Öppna directory
+		
 
 		if ( dir == NULL ) {
 			printf("Couldnt open path directory"); // Krasch om det ej går annars kör vi
@@ -90,7 +91,7 @@ const char* extractpath(Command *cmd, int* isavailable) {
 
 				char* pointer = dirpointer->d_name;
 
-				//printf("%s",pointer);
+				printf("Program: %s\n",pointer);
 
 				long pointerlength = strlen(pointer);
 
