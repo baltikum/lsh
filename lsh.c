@@ -44,23 +44,24 @@ int main(void) {
 
 
 
+
+//PROMPTEN
   char* user = getlogin();
   size_t len = 25;
   char* host = malloc(len); 
   gethostname(host,len);
-  char* sizedhost;
-  
-  while ( host != NULL ) {
+  char* sizedhost = malloc(len);
+  char* sizeee = sizedhost;
+  while ( *host ) {
     *sizedhost = *host;
     sizedhost++;
     host++;
   }
   *sizedhost ='\0';
-
-
   strcat(user,"@");
-  strcat(user,host);
+  strcat(user,sizeee);
   strcat(user,": > ");
+  ///
 
 
 
