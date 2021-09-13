@@ -69,7 +69,7 @@ const char* extractpath(Command *cmd, int* isavailable) {
 
 	long commandlength = strlen(commandtosearchfor);
 
-	printf("Is searching:%s: and it should be %s   it is:%ld long\n",*cmd->pgm->pgmlist,commandtosearchfor,commandlength);
+	//printf("Is searching:%s: and it should be %s   it is:%ld long\n",*cmd->pgm->pgmlist,commandtosearchfor,commandlength);
 
 
 	for ( int i = 0; i < numberofpaths; i++ ) { // gå igenom alla våra paths tills att vi hittar
@@ -102,12 +102,12 @@ const char* extractpath(Command *cmd, int* isavailable) {
 
 					while ( *pointer == *pointer2 ) { // Kolla char för char, k<command för att pekarna
 						k++;
-						printf("%s should be %s \n ",pointer,pointer2);
+						//printf("%s should be %s \n ",pointer,pointer2);
 						
 						pointer++;
 						pointer2++;
+
 						if ( k == (commandlength) ) { // +1 ??? varför ?Kollar om det är matchning
-						
 							*isavailable = 1;
 							printf("Command found in %s\n",retrievedpath);
 							return retrievedpath; // return path till directory där vi hittade binary
