@@ -64,7 +64,7 @@ const char* extractpath(Command *cmd, int* isavailable) {
 
 	
 	DIR *dir;
-	char* commandtosearchfor = "ls";//*cmd->pgm->pgmlist; // fiktivt kommando in
+	char* commandtosearchfor = *cmd->pgm->pgmlist; // fiktivt kommando in
 	
 
 	long commandlength = strlen(commandtosearchfor);
@@ -97,6 +97,9 @@ const char* extractpath(Command *cmd, int* isavailable) {
 
 				if ( commandlength == pointerlength) { // Fortsätt om de är lika långa
 					long k = 0;
+
+					printf("%s should be %s",pointer,commandtosearchfor);
+					
 					while ( *pointer == *commandtosearchfor ) { // Kolla char för char
 						printf("tested on %ld ",k);	
 						k++;
