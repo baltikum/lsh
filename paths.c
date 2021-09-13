@@ -64,7 +64,7 @@ const char* extractpath(Command *cmd, int* isavailable) {
 
 	
 	DIR *dir;
-	char* commandtosearchfor = *cmd->pgm->pgmlist; // fiktivt kommando in
+	char* commandtosearchfor = "ls";//*cmd->pgm->pgmlist; // fiktivt kommando in
 	
 
 	long commandlength = strlen(commandtosearchfor);
