@@ -107,7 +107,7 @@ const char* extractpath(Command *cmd, int* isavailable) {
 						printf("tested on %ld, ",k);	
 						
 						pointer++;
-						commandtosearchfor++;
+						pointer2++;
 
 					};printf("tested on %ld \n",k);
 
