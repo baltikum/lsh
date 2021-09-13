@@ -56,7 +56,7 @@ const char* extractpath(Command *cmd, int* isavailable) {
 			j++;
   		} 
 		savedpaths[i][j] = '\0';
-		printf("SAVED PATH: %s\n",savedpaths[i]);
+		//printf("SAVED PATH: %s\n",savedpaths[i]);
 		++i;
 		pointer = strtok(NULL,":"); // Stega framåt till :
 	}
@@ -69,14 +69,14 @@ const char* extractpath(Command *cmd, int* isavailable) {
 
 	long commandlength = strlen(commandtosearchfor);
 
-	printf("Is searching:%s: and it should be %s   it is:%ld long\n",*cmd->pgm->pgmlist,commandtosearchfor,commandlength);
+	//printf("Is searching:%s: and it should be %s   it is:%ld long\n",*cmd->pgm->pgmlist,commandtosearchfor,commandlength);
 
 
 	for ( int i = 0; i < numberofpaths; i++ ) { // gå igenom alla våra paths tills att vi hittar
 
 		const char* retrievedpath = &savedpaths[i][0];
 
-		printf("\n\nRetreivedpath: %s\n\n",retrievedpath);
+		//printf("\n\nRetreivedpath: %s\n\n",retrievedpath);
 
 		dir = opendir(retrievedpath); //Öppna directory
 		
@@ -100,16 +100,16 @@ const char* extractpath(Command *cmd, int* isavailable) {
 				if ( commandlength == pointerlength) { // Fortsätt om de är lika långa
 					long k = 0;
 
-					printf("%s should be %s for loop to start , ",pointer,pointer2);
+					//printf("%s should be %s for loop to start , ",pointer,pointer2);
 
 					while ( *pointer == *pointer2 ) { // Kolla char för char
 						k++;
-						printf("tested on %ld, ",k);	
+						//printf("tested on %ld, ",k);	
 						
 						pointer++;
 						pointer2++;
 
-					};printf("tested on %ld \n",k);
+					}
 
 					if ( k == (commandlength+1) ) { // +1 ??? varför ?Kollar om det är matchning
 						
