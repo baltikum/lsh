@@ -87,13 +87,13 @@ void RunCommand(int parse_result, Command *cmd) {
 
   if ( 0 ) {
 
-    if (fork() != 0) { 
-      waitpid(−1, &status, 0);
-    } else {
+   // if (fork() != 0) { 
+   //   waitpid(−1, &status, 0);
+   // } else {
 
-      printf("%s",location);
-      printf("%s",cmd->pgm);
-    }
+   //   printf("%s",location);
+     // printf("%s",cmd->pgm);
+   // }
   
 
 
@@ -115,8 +115,7 @@ void RunCommand(int parse_result, Command *cmd) {
   } else {
     printf("Command not available, try installing it ex sudo apt-get install %s\n",cmd->pgm );
   }
-
-  //DebugPrintCommand(parse_result, cmd);
+  DebugPrintCommand(parse_result, cmd);
 }
 
 
