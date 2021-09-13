@@ -71,6 +71,8 @@ const char* extractpath(Command *cmd, int* isavailable) {
 
 		const char* retrievedpath = &savedpaths[i][0];
 
+		printf("%s\n",retrievedpath);
+
 		dir = opendir(retrievedpath); //Öppna directory
 
 		if ( dir == NULL ) {
@@ -83,7 +85,9 @@ const char* extractpath(Command *cmd, int* isavailable) {
 			while( dirpointer = readdir(dir)) { // Loop läser in entrys ifrån directory
 
 				char* pointer = dirpointer->d_name;
+
 				printf("%s",pointer);
+
 				long pointerlength = strlen(pointer);
 
 				if ( commandlength == pointerlength) { // Fortsätt om de är lika långa
