@@ -5,7 +5,11 @@
 #include "parse.h"
 
 
-int extractpath(Command *cmd) {
+
+#include <dirent.h>
+
+
+const char* extractpath(Command *cmd, int* isavailable) {
 
 	const char* paths = getenv("PATH"); // Hämtar miljövariabeln
 	//printf("PATH: %s\n",paths);
@@ -58,7 +62,74 @@ int extractpath(Command *cmd) {
 	}
 
 
-	foundpaths = savedpaths;
+	
+	DIR *dir;
+	char* commandtosearchfor = *cmd->pgm->pgmlist; // fiktivt kommando in
+	long commandlength = strlen(commandtosearchfor);
 
-	return 0;
+	for ( int i = 0; i < numberofpaths; i++ ) { // gå igenom alla våra paths tills att vi hittar
+
+		const char* retrievedpath = &savedpaths[i][0];
+
+		dir = opendir(retrievedpath); //Öppna directory
+
+		if ( dir == NULL ) {
+			printf("Couldnt open path directory"); // Krasch om det ej går annars kör vi
+			return -1;
+		} else {
+
+			struct dirent *dirpointer; // directory entry struct
+
+			while( dirpointer = readdir(dir)) { // Loop läser in entrys ifrån directory
+
+				char* pointer = dirpointer->d_name;
+				long pointerlength = strlen(pointer);
+
+				if ( commandlength == pointerlength) { // Fortsätt om de är lika långa
+					long k = 0;
+					while ( *pointer == *commandtosearchfor ) { // Kolla char för char
+
+						k++;
+
+						pointer++;
+						commandtosearchfor++;
+
+					};
+
+					if ( k == (commandlength+1) ) { // Kollar om det är matchning
+						
+						*isavailable = 1;
+						printf("Command found in %s\n",retrievedpath);
+						return retrievedpath; // return path till directory där vi hittade binary
+					};
+				};
+			};
+
+			closedir(dir);		// Stäng öppnat directory
+		
+			
+		};
+
+	};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

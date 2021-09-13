@@ -27,7 +27,7 @@
 #include<unistd.h>
 #include <sys/wait.h> 
 
-//#include "paths.h"
+#include "paths.h"
 
 #define TRUE 1
 #define FALSE 0
@@ -106,13 +106,20 @@ int main(void) {
  */
 void RunCommand(int parse_result, Command *cmd) {
 
+  int check = 0;
+  int* isavailable = &check;
+  const char* location = extractpath(cmd, isavailable);
 
- // int check = 0;
- // int* isavailable = &check:
- // char* location = lookforcommand(cmd, isavailable);
 
 
-  if ( 0 ) {
+
+
+  if ( check ) {
+      printf("exec");
+
+
+
+
 
    // if (fork() != 0) { 
    //   waitpid(−1, &status, 0);

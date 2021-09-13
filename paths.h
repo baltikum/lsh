@@ -1,1 +1,1 @@
-extern char* lookforcommand(Command *cmd);
+extern const char* extractpath(Command *cmd, int* isavailable);
