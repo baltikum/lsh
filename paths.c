@@ -69,7 +69,8 @@ const char* extractpath(Command *cmd, int* isavailable) {
 
 	long commandlength = strlen(commandtosearchfor);
 
-	printf("Is searching:%s:  it is:%ld long\n",*cmd->pgm->pgmlist,commandlength);
+	printf("Is searching:%s: and it should be %s   it is:%ld long\n",*cmd->pgm->pgmlist,commandtosearchfor,commandlength);
+
 
 	for ( int i = 0; i < numberofpaths; i++ ) { // gå igenom alla våra paths tills att vi hittar
 
@@ -91,7 +92,7 @@ const char* extractpath(Command *cmd, int* isavailable) {
 
 				char* pointer = dirpointer->d_name;
 
-				printf("Program: %s  ",pointer);
+				//printf("Program: %s  ",pointer);
 
 				long pointerlength = strlen(pointer);
 
@@ -99,7 +100,7 @@ const char* extractpath(Command *cmd, int* isavailable) {
 					long k = 0;
 
 					printf("%s should be %s",pointer,commandtosearchfor);
-					
+
 					while ( *pointer == *commandtosearchfor ) { // Kolla char för char
 						printf("tested on %ld ",k);	
 						k++;
