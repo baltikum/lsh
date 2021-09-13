@@ -37,14 +37,30 @@ void DebugPrintCommand(int, Command *);
 void PrintPgm(Pgm *);
 void stripwhite(char *);
 
-int main(void)
-{
+int main(void) {
+
   Command cmd;
   int parse_result;
 
+
+
+  char* user = getlogin();
+  char* host; 
+  size_t len = 20;
+  int result = gethostname(host,len);
+  strcat(user,"@");
+  strcat(user,host);
+  strcat(user,": > ");
+
+
+
   while (TRUE) {
     char *line;
-    line = readline("snoppen> ");
+
+    
+
+  line = readline(user);
+    //line = readline("> ");
 
     /* If EOF encountered, exit shell */
     if (!line) {
