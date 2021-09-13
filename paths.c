@@ -90,7 +90,7 @@ const char* extractpath(Command *cmd, int* isavailable) {
 					while ( *pointer == *commandtosearchfor ) { // Kolla char för char
 
 						k++;
-
+						printf("Letar");
 						pointer++;
 						commandtosearchfor++;
 
