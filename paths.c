@@ -100,7 +100,7 @@ const char* extractpath(Command *cmd, int* isavailable) {
 				if ( commandlength == pointerlength) { // Fortsätt om de är lika långa
 					long k = 0;
 
-					while ( *pointer == *pointer2 ) { // Kolla char för char
+					while ( *pointer == *pointer2 && (k < commandlength) ) { // Kolla char för char, k<command för att pekarna fortsatte ?
 						k++;
 						printf("%s should be %s \n ",pointer,pointer2);
 						
