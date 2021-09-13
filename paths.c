@@ -100,14 +100,13 @@ const char* extractpath(Command *cmd, int* isavailable) {
 				if ( commandlength == pointerlength) { // Fortsätt om de är lika långa
 					long k = 0;
 
-					while ( *pointer == *pointer2 && (k < commandlength) ) { // Kolla char för char, k<command för att pekarna fortsatte ?
+					while ( *pointer == *pointer2 ) { // Kolla char för char, k<command för att pekarna
 						k++;
 						printf("%s should be %s \n ",pointer,pointer2);
 						
 						pointer++;
 						pointer2++;
-						
-						if ( k == (commandlength+1) ) { // +1 ??? varför ?Kollar om det är matchning
+if ( k == (commandlength+1) ) { // +1 ??? varför ?Kollar om det är matchning
 						
 						*isavailable = 1;
 						printf("Command found in %s\n",retrievedpath);
@@ -115,7 +114,12 @@ const char* extractpath(Command *cmd, int* isavailable) {
 					};
 					}
 
-					
+					if ( k == (commandlength+1) ) { // +1 ??? varför ?Kollar om det är matchning
+						
+						*isavailable = 1;
+						printf("Command found in %s\n",retrievedpath);
+						return retrievedpath; // return path till directory där vi hittade binary
+					};
 				};
 			};
 
