@@ -100,17 +100,18 @@ const char* extractpath(Command *cmd, int* isavailable) {
 				if ( commandlength == pointerlength) { // Fortsätt om de är lika långa
 					long k = 0;
 
-					printf("%s should be %s",pointer,commandtosearchfor);
+					printf("%s should be %s for loop to start , ",pointer,pointer2);
 
 					while ( *pointer == *pointer2 ) { // Kolla char för char
-						printf("tested on %ld ",k);	
 						k++;
+						printf("tested on %ld, ",k);	
+						
 						pointer++;
 						commandtosearchfor++;
 
 					};printf("tested on %ld \n",k);
 
-					if ( k == (commandlength) ) { // +1 ??? varför ?Kollar om det är matchning
+					if ( k == (commandlength+1) ) { // +1 ??? varför ?Kollar om det är matchning
 						
 						*isavailable = 1;
 						printf("Command found in %s\n",retrievedpath);
