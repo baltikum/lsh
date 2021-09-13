@@ -42,16 +42,16 @@ int main(void)
   Command cmd;
   int parse_result;
 
-  while (TRUE)
-  {
+  while (TRUE) {
     char *line;
-    line = readline("> ");
+    line = readline("snoppen> ");
 
     /* If EOF encountered, exit shell */
-    if (!line)
-    {
+    if (!line) {
       break;
     }
+
+
     /* Remove leading and trailing whitespace from the line */
     stripwhite(line);
     /* If stripped line not blank */
