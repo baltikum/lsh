@@ -83,6 +83,7 @@ const char* extractpath(Command *cmd, int* isavailable) {
 			while( dirpointer = readdir(dir)) { // Loop läser in entrys ifrån directory
 
 				char* pointer = dirpointer->d_name;
+				printf("%s",pointer);
 				long pointerlength = strlen(pointer);
 
 				if ( commandlength == pointerlength) { // Fortsätt om de är lika långa
@@ -90,7 +91,6 @@ const char* extractpath(Command *cmd, int* isavailable) {
 					while ( *pointer == *commandtosearchfor ) { // Kolla char för char
 
 						k++;
-						printf("Letar");
 						pointer++;
 						commandtosearchfor++;
 
