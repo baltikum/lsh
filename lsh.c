@@ -45,9 +45,9 @@ int main(void) {
 
 
   char* user = getlogin();
-  char* host; 
   size_t len = 20;
-  int result = gethostname(host,len);
+  char* host = malloc(len); 
+  gethostname(host,len);
   strcat(user,"@");
   strcat(user,host);
   strcat(user,": > ");
