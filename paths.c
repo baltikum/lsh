@@ -91,21 +91,21 @@ const char* extractpath(Command *cmd, int* isavailable) {
 
 				char* pointer = dirpointer->d_name;
 
-				printf("Program: %s\n",pointer);
+				printf("Program: %s  ",pointer);
 
 				long pointerlength = strlen(pointer);
 
 				if ( commandlength == pointerlength) { // Fortsätt om de är lika långa
 					long k = 0;
 					while ( *pointer == *commandtosearchfor ) { // Kolla char för char
-
+						printf("tested on %ld ",k);	
 						k++;
 						pointer++;
 						commandtosearchfor++;
 
-					};
+					};printf("tested on %ld \n",k);
 
-					if ( k == (commandlength+1) ) { // Kollar om det är matchning
+					if ( k == (commandlength) ) { // +1 ??? varför ?Kollar om det är matchning
 						
 						*isavailable = 1;
 						printf("Command found in %s\n",retrievedpath);
