@@ -2,9 +2,10 @@
 #include <string.h>
 #include <stdlib.h> // getenv()
 
+#include "parse.h"
 
 
-int main() {
+int extractpath(Command *cmd) {
 
 	const char* paths = getenv("PATH"); // Hämtar miljövariabeln
 	//printf("PATH: %s\n",paths);
@@ -15,8 +16,6 @@ int main() {
 	char copiedpath[pathlength];
 	strcpy(copiedpath,paths); // Kopierar den då den är immutable
 	//printf("PATH COPIED: %s\n",copiedpath);
-
-
 
 	int numberofpaths = 1;
 	int pathsize = 0;
@@ -57,4 +56,9 @@ int main() {
 		++i;
 		pointer = strtok(NULL,":"); // Stega framåt till :
 	}
+
+
+	foundpaths = savedpaths;
+
+	return 0;
 }

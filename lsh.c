@@ -24,6 +24,8 @@
 #include <readline/history.h>
 #include "parse.h"
 
+//#include "paths.h"
+
 #define TRUE 1
 #define FALSE 0
 
@@ -72,9 +74,46 @@ int main(void)
  * 1. Implement this function so that it executes the given command(s).
  * 2. Remove the debug printing before the final submission.
  */
-void RunCommand(int parse_result, Command *cmd)
-{
-  DebugPrintCommand(parse_result, cmd);
+void RunCommand(int parse_result, Command *cmd) {
+
+
+ // int check = 0;
+ // int* isavailable = &check:
+ // char* location = lookforcommand(cmd, isavailable);
+
+
+  if ( 0 ) {
+
+    if (fork() != 0) { 
+      waitpid(−1, &status, 0);
+    } else {
+
+      printf("%s",location);
+      printf("%s",cmd->pgm);
+    }
+  
+
+
+//char *strcat(char *dest, const char *src)
+     
+      //char* fullpath = strcat(char *location, cmd->pgm);
+
+
+
+
+//int execve(const char *pathname, char *const argv[],
+        //          char *const envp[]);
+
+      //execve(fullpath, parameters, 0);
+    
+
+    // Kör kommandot
+
+  } else {
+    printf("Command not available, try installing it ex sudo apt-get install %s\n",cmd->pgm );
+  }
+
+  //DebugPrintCommand(parse_result, cmd);
 }
 
 
