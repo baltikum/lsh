@@ -24,6 +24,9 @@
 #include <readline/history.h>
 #include "parse.h"
 
+#include<unistd.h>
+#include <sys/wait.h> 
+
 //#include "paths.h"
 
 #define TRUE 1
