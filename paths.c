@@ -91,6 +91,7 @@ const char* extractpath(Command *cmd, int* isavailable) {
 			while( dirpointer = readdir(dir)) { // Loop läser in entrys ifrån directory
 
 				char* pointer = dirpointer->d_name;
+				char* pointer2 = commandtosearchfor;
 
 				//printf("Program: %s  ",pointer);
 
@@ -101,7 +102,7 @@ const char* extractpath(Command *cmd, int* isavailable) {
 
 					printf("%s should be %s",pointer,commandtosearchfor);
 
-					while ( *pointer == *commandtosearchfor ) { // Kolla char för char
+					while ( *pointer == *pointer2 ) { // Kolla char för char
 						printf("tested on %ld ",k);	
 						k++;
 						pointer++;
