@@ -113,11 +113,10 @@ void RunCommand(int parse_result, Command *cmd) {
     // Kör kommandot
 
   } else {
-    printf("Command not available, try installing it ex sudo apt-get install %s\n",cmd->pgm );
+    printf("Command not available, try installing it ex sudo apt-get install %s\n",*cmd->pgm->pgmlist );
   }
   DebugPrintCommand(parse_result, cmd);
 }
-
 
 /* 
  * Print a Command structure as returned by parse on stdout. 
