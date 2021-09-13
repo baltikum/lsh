@@ -75,7 +75,7 @@ const char* extractpath(Command *cmd, int* isavailable) {
 
 		if ( dir == NULL ) {
 			printf("Couldnt open path directory"); // Krasch om det ej går annars kör vi
-			return -1;
+			//return -1;
 		} else {
 
 			struct dirent *dirpointer; // directory entry struct
