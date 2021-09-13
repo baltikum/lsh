@@ -65,7 +65,11 @@ const char* extractpath(Command *cmd, int* isavailable) {
 	
 	DIR *dir;
 	char* commandtosearchfor = *cmd->pgm->pgmlist; // fiktivt kommando in
+	
+
 	long commandlength = strlen(commandtosearchfor);
+
+	printf("Is searching:%s:  it is:%ld long",*cmd->pgm->pgmlist.commandlength);
 
 	for ( int i = 0; i < numberofpaths; i++ ) { // gå igenom alla våra paths tills att vi hittar
 
