@@ -86,7 +86,7 @@ const char* extractpath(Command *cmd, int* isavailable) {
 
 				char* pointer = dirpointer->d_name;
 
-				printf("%s",pointer);
+				//printf("%s",pointer);
 
 				long pointerlength = strlen(pointer);
 
