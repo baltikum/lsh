@@ -49,6 +49,7 @@ int main(void) {
   char* host = malloc(len); 
   gethostname(host,len);
   char* sizedhost;
+  
   while ( host != NULL ) {
     *sizedhost = *host;
     sizedhost++;
