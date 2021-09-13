@@ -75,7 +75,7 @@ const char* extractpath(Command *cmd, int* isavailable) {
 
 		const char* retrievedpath = &savedpaths[i][0];
 
-		printf("Retreivedpath: %s\n",retrievedpath);
+		printf("Retreivedpath: %s\n\n",retrievedpath);
 
 		dir = opendir(retrievedpath); //Öppna directory
 		
