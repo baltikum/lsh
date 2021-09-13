@@ -100,16 +100,14 @@ const char* extractpath(Command *cmd, int* isavailable) {
 				if ( commandlength == pointerlength) { // Fortsätt om de är lika långa
 					long k = 0;
 
-					printf("%s should be %s for loop to start , ",pointer,pointer2);
-
 					while ( *pointer == *pointer2 ) { // Kolla char för char
 						k++;
-						printf("tested on %ld, ",k);	
+						printf("%s should be %s \n ",pointer,pointer2);
 						
 						pointer++;
 						pointer2++;
 
-					}printf("tested on %ld \n",k);
+					}
 
 					if ( k == (commandlength+1) ) { // +1 ??? varför ?Kollar om det är matchning
 						
