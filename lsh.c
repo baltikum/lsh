@@ -140,7 +140,7 @@ void RunCommand(int parse_result, Command *cmd) {
   } else {
     printf("Command not available, try installing it ex sudo apt-get install %s\n",*cmd->pgm->pgmlist );
   }
-  DebugPrintCommand(parse_result, cmd);
+  //DebugPrintCommand(parse_result, cmd);
 }
 
 /* 
