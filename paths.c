@@ -110,6 +110,8 @@ const char* extractpath(Command *cmd, _Bool* isavailable) {
 							*isavailable = 1;
 							printf("Command found in %s\n",retrievedpath);
 
+
+							printf("%ld\n\n",strlen(retrievedpath));
 							char* temp = malloc(strlen(retrievedpath));
 							//location = malloc(strlen(retrievedpath) + 1);
 
