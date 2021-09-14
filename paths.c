@@ -59,16 +59,25 @@ const char* extractpath(Command *cmd, _Bool* isavailable) {
 
 	//printf("Is searching:%s: and it should be %s   it is:%ld long\n",*cmd->pgm->pgmlist,commandtosearchfor,commandlength);
 
-	while ( spaths[i] != NULL ) {
-		printf("%s\n",spaths[i]);
-		i++;
+	for ( int j = 0; j < i; j++ ) {
+		printf("%s\n",spaths[j]);
 	}
+
+	//int b = 0;
+	//while ( spaths[b] != "" ) {
+	//	printf("%s\n",spaths[b]);
+	//	b++;
+	//}
+
+
+
 
 
 	for ( int i = 0; i < numberofpaths; i++ ) { // gå igenom alla våra paths tills att vi hittar
 
 		//const char* retrievedpath = &savedpaths[i][0];
 		const char* retrievedpath = spaths[i];
+
 
 		//printf("\n\nRetreivedpath: %s\n\n",retrievedpath);
 
