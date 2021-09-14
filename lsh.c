@@ -93,7 +93,7 @@ void RunCommand(int parse_result, Command *cmd) {
   
 
   const char* location = extractpath(cmd, isavailable);
-  char* fullexec = malloc(strlen(location)+strlen(*cmd->pgm->pgmlist));
+ 
 
 
 
@@ -108,6 +108,9 @@ void RunCommand(int parse_result, Command *cmd) {
       //printf("This is Parent I will wait for my child\n");
       waitpid(pid, status, options);
     } else {
+
+      char* fullexec = malloc(strlen(location)+strlen(*cmd->pgm->pgmlist));
+
       printf("LOCATION IS: %s\n ",location);
       printf("COMMAND IS: %s\n",*cmd->pgm->pgmlist);
 
