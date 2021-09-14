@@ -111,7 +111,10 @@ void RunCommand(int parse_result, Command *cmd) {
       printf("LENGTH LOC: %ld\n",strlen(location));
       printf("LENGTH COM: %ld\n",strlen(*cmd->pgm->pgmlist));
 
-      char* fullexec = malloc(strlen(location)+1+strlen(*cmd->pgm->pgmlist));
+
+      long length = (strlen(location)+1+strlen(*cmd->pgm->pgmlist));
+      printf("%ld\n",length);
+      char* fullexec = malloc(length);
       printf("LENGTH MALLOC: %ld\n",strlen(fullexec));
 
       printf("LOCATION IS: %s\n ",location);
