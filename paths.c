@@ -9,17 +9,17 @@
 #include <dirent.h>
 
 
-const char* extractpath(Command *cmd, int* isavailable) {
+const char* extractpath(Command *cmd, _Bool* isavailable) {
 
 	const char* paths = getenv("PATH"); // Hämtar miljövariabeln
-	printf("PATH: %s\n",paths);
+	//printf("PATH: %s\n",paths);
 
 	long pathlength = strlen(paths); // Kolla längden av denna
-	printf("PATHLENGTH: %ld\n",pathlength);
+	//printf("PATHLENGTH: %ld\n",pathlength);
 
 	char copiedpath[pathlength];
 	strcpy(copiedpath,paths); // Kopierar den då den är immutable
-	printf("PATH COPIED: %s\n",copiedpath);
+	//printf("PATH COPIED: %s\n",copiedpath);
 
 	int numberofpaths = 1;
 	int pathsize = 0;
@@ -56,7 +56,7 @@ const char* extractpath(Command *cmd, int* isavailable) {
 			j++;
   		} 
 		savedpaths[i][j] = '\0';
-		printf("SAVED PATH: %s\n",savedpaths[i]);
+		//printf("SAVED PATH: %s\n",savedpaths[i]);
 		++i;
 		pointer = strtok(NULL,":"); // Stega framåt till :
 	}

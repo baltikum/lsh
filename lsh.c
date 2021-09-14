@@ -25,7 +25,11 @@
 #include "parse.h"
 
 #include<unistd.h>
-#include <sys/wait.h> 
+
+
+
+#include <sys/types.h>
+#include <sys/wait.h> // waitpid()
 
 #include "paths.h"
 
@@ -36,42 +40,19 @@ void RunCommand(int, Command *);
 void DebugPrintCommand(int, Command *);
 void PrintPgm(Pgm *);
 void stripwhite(char *);
+char* setcustomprompt();
 
 int main(void) {
 
   Command cmd;
   int parse_result;
 
-
-
-
-//PROMPTEN
-  char* user = getlogin();
-  size_t len = 25;
-  char* host = malloc(len); 
-  gethostname(host,len);
-  char* sizedhost = malloc(len);
-  char* sizeee = sizedhost;
-  while ( *host ) {
-    *sizedhost = *host;
-    sizedhost++;
-    host++;
-  }
-  *sizedhost ='\0';
-  strcat(user,"@");
-  strcat(user,sizeee);
-  strcat(user,": > ");
-  ///
-
-
+  char* prompt = setcustomprompt();
 
   while (TRUE) {
+
     char *line;
-
-    
-
-  line = readline(user);
-    //line = readline("> ");
+    line = readline(prompt);
 
     /* If EOF encountered, exit shell */
     if (!line) {
@@ -106,29 +87,22 @@ int main(void) {
  */
 void RunCommand(int parse_result, Command *cmd) {
 
-  int check = 0;
-  int* isavailable = &check;
+  _Bool check = 0;
+  _Bool* isavailable = &check;
   const char* location = extractpath(cmd, isavailable);
-
-
-
-_Bool hej = 1;
 
   if ( check ) {
 
-      printf("exec\n");
+    pid_t pid;
+    int* status;
+    int options = 0;
 
-
-
-
-
-   // if (fork() != 0) { 
-   //   waitpid(−1, &status, 0);
-   // } else {
-
-   //   printf("%s",location);
-     // printf("%s",cmd->pgm);
-   // }
+    if ( pid = fork() != 0) {
+      waitpid(pid, status, options);
+    } else {
+      printf("%s/",location);
+      printf("%s\n",*cmd->pgm->pgmlist);
+    }
   
 
 
@@ -150,7 +124,7 @@ _Bool hej = 1;
   } else {
     printf("Command not available, try installing it ex sudo apt-get install %s\n",*cmd->pgm->pgmlist );
   }
-  DebugPrintCommand(parse_result, cmd);
+  //DebugPrintCommand(parse_result, cmd);
 }
 
 /* 
@@ -228,4 +202,23 @@ void stripwhite(char *string)
   }
 
   string[++i] = '\0';
+}
+
+char* setcustomprompt() {
+  char* user = getlogin();
+  size_t len = 25;
+  char* host = malloc(len); 
+  gethostname(host,len);
+  char* sizedhost = malloc(len);
+  char* downsized = sizedhost;
+  while ( *host ) {
+    *sizedhost = *host;
+    sizedhost++;
+    host++;
+  }
+  *sizedhost ='\0';
+  strcat(user,"@");
+  strcat(user,downsized);
+  strcat(user,": > ");
+  return user;
 }
