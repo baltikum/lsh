@@ -50,17 +50,17 @@ const char* extractpath(Command *cmd, _Bool* isavailable) {
 
 	while( pointer != NULL ) {
 
-		char *savepath = pointer;
+		//char *savepath = pointer;
 		spaths[i] = pointer;
-		printf("%s\n",pointer);
-		int j = 0;
-		while(*savepath != '\0') {
-    		//printf("%c", *savepath);
-			savedpaths[i][j] = *savepath;
-    			savepath++;
-			j++;
-  		} 
-		savedpaths[i][j] = '\0';
+		//printf("%s\n",pointer);
+		//int j = 0;
+		//while(*savepath != '\0') {
+    	//	//printf("%c", *savepath);
+		//	savedpaths[i][j] = *savepath;
+    	//		savepath++;
+		//	j++;
+  		//} 
+		//savedpaths[i][j] = '\0';
 		//printf("SAVED PATH: %s\n",savedpaths[i]);
 		++i;
 		pointer = strtok(NULL,":"); // Stega framåt till :
@@ -70,7 +70,7 @@ const char* extractpath(Command *cmd, _Bool* isavailable) {
 
 	
 	DIR *dir;
-	char* commandtosearchfor = *cmd->pgm->pgmlist; // fiktivt kommando in
+	char* commandtosearchfor = *cmd->pgm->pgmlist;
 	
 
 	long commandlength = strlen(commandtosearchfor);
@@ -80,7 +80,8 @@ const char* extractpath(Command *cmd, _Bool* isavailable) {
 
 	for ( int i = 0; i < numberofpaths; i++ ) { // gå igenom alla våra paths tills att vi hittar
 
-		const char* retrievedpath = &savedpaths[i][0];
+		//const char* retrievedpath = &savedpaths[i][0];
+		const char* retrievedpath = spaths[i];
 
 		//printf("\n\nRetreivedpath: %s\n\n",retrievedpath);
 
