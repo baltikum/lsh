@@ -90,13 +90,7 @@ void RunCommand(int parse_result, Command *cmd) {
   _Bool check = 0;
   _Bool* isavailable = &check;
 
-  
-
   const char* location = extractpath(cmd, isavailable);
- 
-
-
-
 
   if ( check ) {
 
@@ -105,43 +99,23 @@ void RunCommand(int parse_result, Command *cmd) {
     int options = 0;
 
     if ( pid = fork() != 0) {
-      //printf("This is Parent I will wait for my child\n");
       waitpid(pid, status, options);
     } else {
-      //printf("LENGTH LOC: %ld\n",strlen(location));
-      //printf("LENGTH COM: %ld\n",strlen(*cmd->pgm->pgmlist));
-
 
       long length = (strlen(location)+1+strlen(*cmd->pgm->pgmlist));
-      //printf("%ld\n",length);
       char* fullexec = malloc(length);
-      //printf("LENGTH MALLOC: %ld\n",strlen(fullexec));
-
-      //printf("LOCATION IS: %s\n ",location);
-      //printf("COMMAND IS: %s\n",*cmd->pgm->pgmlist);
 
       strcpy(fullexec,location);
-      //printf("LENGTH CAT LOC: %ld\n",strlen(fullexec));
       strcat(fullexec,"/");
-
-      //printf("LENGTH CAT /: %ld\n",strlen(fullexec));
       strcat(fullexec,*cmd->pgm->pgmlist);
-      //printf("LENGTH CAT COMMAND: %ld\n",strlen(fullexec));
-      //strcat(fullexec,"\0");
 
-      const char* executethis = fullexec;
-
-      printf("FULL EXEC IS : %s\n",executethis);
-
-      char *argv[] = {(char*)location,NULL};
-
-      execvp(fullexec,argv);
+      execvp(fullexec,cmd->pgm->pgmlist);
 
     }
 
 
   } else {
-    printf("Command not available, try installing it ex sudo apt-get install %s\n",*cmd->pgm->pgmlist );
+    printf("Command not available = %s\n",*cmd->pgm->pgmlist );
   }
   //DebugPrintCommand(parse_result, cmd);
 }
@@ -224,6 +198,7 @@ void stripwhite(char *string)
 }
 
 char* setcustomprompt() {
+  
   char* user = getlogin();
   size_t len = 25;
   char* host = malloc(len); 
@@ -238,6 +213,6 @@ char* setcustomprompt() {
   *sizedhost ='\0';
   strcat(user,"@");
   strcat(user,downsized);
-  strcat(user,": > ");
+  strcat(user,"--> ");
   return user;
 }
