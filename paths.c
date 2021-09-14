@@ -8,7 +8,7 @@
 
 #include <dirent.h>
 
-int extractpath(Command *cmd, _Bool* isavailable, char* location) {
+const char* extractpath(Command *cmd, _Bool* isavailable) {
 
 	const char* paths = getenv("PATH"); // Hämtar miljövariabeln
 	//printf("PATH: %s\n",paths);
@@ -81,8 +81,8 @@ int extractpath(Command *cmd, _Bool* isavailable, char* location) {
 		
 
 		if ( dir == NULL ) {
-			printf("Couldnt open path directory"); // Krasch om det ej går annars kör vi
-			return -1;
+			printf("Couldnt open path directory.\n"); // Krasch om det ej går annars kör vi
+			//return -1;
 		} else {
 
 			struct dirent *dirpointer; // directory entry struct
@@ -109,9 +109,23 @@ int extractpath(Command *cmd, _Bool* isavailable, char* location) {
 						if ( k == (commandlength) ) { // +1 ??? varför ?Kollar om det är matchning
 							*isavailable = 1;
 							printf("Command found in %s\n",retrievedpath);
-							strcpy(location,retrievedpath);
-							//return retrievedpath; // return path till directory där vi hittade binary
-							return 0;
+
+							char* temp = malloc(strlen(retrievedpath) + 1);
+							//location = malloc(strlen(retrievedpath) + 1);
+
+							strcpy(temp,retrievedpath);
+
+							//printf("temp in extractfunc is now = %s\n",temp);
+							//printf("location in extractfunc is now = %s\n",location);
+
+
+							//location = temp;
+
+							printf("Returning = %s\n",temp);
+
+							return temp;
+
+							closedir(dir);
 						};
 					}
 

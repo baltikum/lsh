@@ -24,7 +24,7 @@
 #include <readline/history.h>
 #include "parse.h"
 
-#include<unistd.h>
+#include<unistd.h> //execvp()
 
 
 
@@ -90,11 +90,13 @@ void RunCommand(int parse_result, Command *cmd) {
   _Bool check = 0;
   _Bool* isavailable = &check;
 
+  
+
+  const char* location = extractpath(cmd, isavailable);
+  char* fullexec = malloc(strlen(location)+strlen(*cmd->pgm->pgmlist)+1);
 
 
-  char* location;
 
-  int result = extractpath(cmd, isavailable,location);
 
   if ( check ) {
 
@@ -103,33 +105,32 @@ void RunCommand(int parse_result, Command *cmd) {
     int options = 0;
 
     if ( pid = fork() != 0) {
+      //printf("This is Parent I will wait for my child\n");
       waitpid(pid, status, options);
     } else {
-      //printf("%s\n",location);
-     // printf("%s\n",*cmd->pgm->pgmlist);
+      //printf("LOCATION IS: %s\n ",location);
+      //printf("COMMAND IS: %s\n",*cmd->pgm->pgmlist);
+
+      strcat(fullexec,location);
+      strcat(fullexec,"/");
+      strcat(fullexec,*cmd->pgm->pgmlist);
+
+      const char* executethis = fullexec;
+      //strcpy(executethis,location);
+
+      //printf("FULL EXEC IS : %s\n",executethis);
+      //int execvp(const char *file, char *const argv[]);
+      char *argv[] = {(char*)location,NULL};
+
+      execvp(fullexec,argv);
+
     }
-  
 
-
-//char *strcat(char *dest, const char *src)
-     
-      //char* fullpath = strcat(char *location, cmd->pgm);
-
-
-
-
-//int execve(const char *pathname, char *const argv[],
-        //          char *const envp[]);
-
-      //execve(fullpath, parameters, 0);
-    
-
-    // Kör kommandot
 
   } else {
     printf("Command not available, try installing it ex sudo apt-get install %s\n",*cmd->pgm->pgmlist );
   }
-  //DebugPrintCommand(parse_result, cmd);
+  DebugPrintCommand(parse_result, cmd);
 }
 
 /* 
