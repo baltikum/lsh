@@ -39,7 +39,7 @@ const char* extractpath(Command *cmd, _Bool* isavailable) {
 
 	char savedpaths[numberofpaths][largestpathsize+1];
 
-	char ** spaths;
+	char * spaths[15];
 	char ** sspaths = spaths;
 
 	char* pointer; // Pekare för att stega igenom copiedpath
@@ -51,12 +51,12 @@ const char* extractpath(Command *cmd, _Bool* isavailable) {
 	while( pointer != NULL ) {
 
 		char *savepath = pointer;
+		spaths[i] = pointer;
+		printf("%s\n",pointer);
 		int j = 0;
 		while(*savepath != '\0') {
     		//printf("%c", *savepath);
-    		**spaths = *savepath;
 			savedpaths[i][j] = *savepath;
-    			spaths++;
     			savepath++;
 			j++;
   		} 
@@ -66,6 +66,7 @@ const char* extractpath(Command *cmd, _Bool* isavailable) {
 		++i;
 		pointer = strtok(NULL,":"); // Stega framåt till :
 	}
+
 
 
 	
