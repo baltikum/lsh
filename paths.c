@@ -62,7 +62,6 @@ const char* extractpath(Command *cmd, _Bool* isavailable) {
   		} 
 		savedpaths[i][j] = '\0';
 		//printf("SAVED PATH: %s\n",savedpaths[i]);
-		printf("SAVED PATH: %s\n",*sspaths);
 		++i;
 		pointer = strtok(NULL,":"); // Stega framåt till :
 	}
