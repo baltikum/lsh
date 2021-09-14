@@ -110,7 +110,9 @@ const char* extractpath(Command *cmd, _Bool* isavailable) {
 						if ( k == (commandlength) ) { // +1 ??? varför ?Kollar om det är matchning
 							*isavailable = 1;
 							printf("Command found in %s\n",retrievedpath);
-							return retrievedpath; // return path till directory där vi hittade binary
+							//return retrievedpath; // return path till directory där vi hittade binary
+							char* result = (char*)retrievedpath;
+							return result;
 						};
 					}
 
