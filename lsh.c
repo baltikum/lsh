@@ -117,7 +117,7 @@ void RunCommand(int parse_result, Command *cmd) {
       strcat(fullexec,location);
       strcat(fullexec,"/");
       strcat(fullexec,*cmd->pgm->pgmlist);
-      strcat(fullexec,"\0");
+      //strcat(fullexec,"\0");
 
       const char* executethis = fullexec;
 
