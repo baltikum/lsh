@@ -9,7 +9,7 @@
 #include <dirent.h>
 
 
-const char* extractpath(Command *cmd, _Bool* isavailable) {
+char* extractpath(Command *cmd, _Bool* isavailable) {
 
 	const char* paths = getenv("PATH"); // Hämtar miljövariabeln
 	//printf("PATH: %s\n",paths);
