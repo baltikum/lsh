@@ -53,36 +53,14 @@ const char* extractpath(Command *cmd, _Bool* isavailable) {
 	
 	DIR *dir;
 	char* commandtosearchfor = *cmd->pgm->pgmlist;
-	
-
 	long commandlength = strlen(commandtosearchfor);
 
-	//printf("Is searching:%s: and it should be %s   it is:%ld long\n",*cmd->pgm->pgmlist,commandtosearchfor,commandlength);
 
 	for ( int j = 0; j < i; j++ ) {
-		printf("%s\n",spaths[j]);
-	}
 
-	//int b = 0;
-	//while ( spaths[b] != "" ) {
-	//	printf("%s\n",spaths[b]);
-	//	b++;
-	//}
+		const char* retrievedpath = spaths[j];
 
-
-
-
-
-	for ( int i = 0; i < numberofpaths; i++ ) { // gå igenom alla våra paths tills att vi hittar
-
-		//const char* retrievedpath = &savedpaths[i][0];
-		const char* retrievedpath = spaths[i];
-
-
-		//printf("\n\nRetreivedpath: %s\n\n",retrievedpath);
-
-		dir = opendir(retrievedpath); //Öppna directory
-		
+		dir = opendir(retrievedpath);
 
 		if ( dir == NULL ) {
 			printf("Couldnt open path directory.\n"); // Krasch om det ej går annars kör vi
@@ -138,30 +116,17 @@ const char* extractpath(Command *cmd, _Bool* isavailable) {
 			};
 
 			closedir(dir);		// Stäng öppnat directory
-		
 			
 		};
 
+		//printf("%s\n",spaths[j]);
+	}
+
+
+
+
+
+
+
+
 	};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-}
