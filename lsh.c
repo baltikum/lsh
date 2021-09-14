@@ -112,10 +112,11 @@ void RunCommand(int parse_result, Command *cmd) {
 
 
 
-
+_Bool hej = 1;
 
   if ( check ) {
-      printf("exec");
+
+      printf("exec\n");
 
 
 
