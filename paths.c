@@ -38,6 +38,10 @@ const char* extractpath(Command *cmd, _Bool* isavailable) {
 
 
 	char savedpaths[numberofpaths][largestpathsize+1];
+
+	char ** spaths;
+	char ** sspaths = spaths;
+
 	char* pointer; // Pekare för att stega igenom copiedpath
 
 	pointer = strtok(copiedpath,":"); // Stegar fram till :
@@ -50,12 +54,15 @@ const char* extractpath(Command *cmd, _Bool* isavailable) {
 		int j = 0;
 		while(*savepath != '\0') {
     		//printf("%c", *savepath);
+    		**spaths = *savepath;
 			savedpaths[i][j] = *savepath;
+    			spaths++;
     			savepath++;
 			j++;
   		} 
 		savedpaths[i][j] = '\0';
 		//printf("SAVED PATH: %s\n",savedpaths[i]);
+		printf("SAVED PATH: %s\n",*sspaths);
 		++i;
 		pointer = strtok(NULL,":"); // Stega framåt till :
 	}
@@ -110,8 +117,6 @@ const char* extractpath(Command *cmd, _Bool* isavailable) {
 							*isavailable = 1;
 							printf("Command found in %s\n",retrievedpath);
 
-
-							printf("%ld\n\n",strlen(retrievedpath));
 							char* temp = malloc(strlen(retrievedpath));
 							//location = malloc(strlen(retrievedpath) + 1);
 
