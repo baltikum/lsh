@@ -63,10 +63,9 @@ const char* extractpath(Command *cmd, _Bool* isavailable) {
 		dir = opendir(retrievedpath);
 
 		if ( dir == NULL ) {
-			printf("Couldnt open path directory.\n"); // Krasch om det ej går annars kör vi
-			//return -1;
+			printf("Couldnt open path directory.\n");
 		} else {
-
+			
 			struct dirent *dirpointer; // directory entry struct
 
 			while( dirpointer = readdir(dir)) { // Loop läser in entrys ifrån directory
