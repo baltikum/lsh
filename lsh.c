@@ -117,7 +117,7 @@ void RunCommand(int parse_result, Command *cmd) {
       printf("LOCATION IS: %s\n ",location);
       printf("COMMAND IS: %s\n",*cmd->pgm->pgmlist);
 
-      strcat(fullexec,location);
+      strcpy(fullexec,location);
       printf("LENGTH CAT LOC: %ld\n",strlen(fullexec));
       strcat(fullexec,"/");
 
