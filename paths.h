@@ -1,1 +1,1 @@
-extern char* extractpath(Command *cmd, _Bool* isavailable);
+extern char[] extractpath(Command *cmd, _Bool* isavailable);

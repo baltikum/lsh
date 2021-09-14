@@ -89,7 +89,12 @@ void RunCommand(int parse_result, Command *cmd) {
 
   _Bool check = 0;
   _Bool* isavailable = &check;
-  char* location = extractpath(cmd, isavailable);
+
+
+
+  char* location;
+
+  int result = extractpath(cmd, isavailable,location);
 
   if ( check ) {
 

@@ -8,8 +8,7 @@
 
 #include <dirent.h>
 
-
-char* extractpath(Command *cmd, _Bool* isavailable) {
+int extractpath(Command *cmd, _Bool* isavailable, char* location) {
 
 	const char* paths = getenv("PATH"); // Hämtar miljövariabeln
 	//printf("PATH: %s\n",paths);
@@ -110,9 +109,9 @@ char* extractpath(Command *cmd, _Bool* isavailable) {
 						if ( k == (commandlength) ) { // +1 ??? varför ?Kollar om det är matchning
 							*isavailable = 1;
 							printf("Command found in %s\n",retrievedpath);
+							strcpy(location,retrievedpath);
 							//return retrievedpath; // return path till directory där vi hittade binary
-							char* result = (char*)retrievedpath;
-							return result;
+							return 0;
 						};
 					}
 
