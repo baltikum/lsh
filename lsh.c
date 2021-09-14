@@ -110,6 +110,7 @@ void RunCommand(int parse_result, Command *cmd) {
     } else {
 
       char* fullexec = malloc(strlen(location)+strlen(*cmd->pgm->pgmlist));
+      printf("LENGTH: %ld\n",strlen(fullexec));
 
       printf("LOCATION IS: %s\n ",location);
       printf("COMMAND IS: %s\n",*cmd->pgm->pgmlist);
