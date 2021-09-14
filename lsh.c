@@ -108,18 +108,18 @@ void RunCommand(int parse_result, Command *cmd) {
       //printf("This is Parent I will wait for my child\n");
       waitpid(pid, status, options);
     } else {
-      //printf("LOCATION IS: %s\n ",location);
-      //printf("COMMAND IS: %s\n",*cmd->pgm->pgmlist);
+      printf("LOCATION IS: %s\n ",location);
+      printf("COMMAND IS: %s\n",*cmd->pgm->pgmlist);
 
       strcat(fullexec,location);
       strcat(fullexec,"/");
       strcat(fullexec,*cmd->pgm->pgmlist);
+      strcat(fullexec,"\0");
 
       const char* executethis = fullexec;
-      //strcpy(executethis,location);
 
-      //printf("FULL EXEC IS : %s\n",executethis);
-      //int execvp(const char *file, char *const argv[]);
+      printf("FULL EXEC IS : %s\n",executethis);
+      
       char *argv[] = {(char*)location,NULL};
 
       execvp(fullexec,argv);
