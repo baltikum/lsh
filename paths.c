@@ -37,31 +37,13 @@ const char* extractpath(Command *cmd, _Bool* isavailable) {
 	}
 
 
-	char savedpaths[numberofpaths][largestpathsize+1];
-
 	char * spaths[15];
-	char ** sspaths = spaths;
-
 	char* pointer; // Pekare för att stega igenom copiedpath
-
 	pointer = strtok(copiedpath,":"); // Stegar fram till :
-
 	int i = 0;
 
 	while( pointer != NULL ) {
-
-		//char *savepath = pointer;
 		spaths[i] = pointer;
-		//printf("%s\n",pointer);
-		//int j = 0;
-		//while(*savepath != '\0') {
-    	//	//printf("%c", *savepath);
-		//	savedpaths[i][j] = *savepath;
-    	//		savepath++;
-		//	j++;
-  		//} 
-		//savedpaths[i][j] = '\0';
-		//printf("SAVED PATH: %s\n",savedpaths[i]);
 		++i;
 		pointer = strtok(NULL,":"); // Stega framåt till :
 	}
@@ -76,6 +58,11 @@ const char* extractpath(Command *cmd, _Bool* isavailable) {
 	long commandlength = strlen(commandtosearchfor);
 
 	//printf("Is searching:%s: and it should be %s   it is:%ld long\n",*cmd->pgm->pgmlist,commandtosearchfor,commandlength);
+
+	while ( spaths[i] != NULL ) {
+		printf("%s\n",spaths[i]);
+		i++;
+	}
 
 
 	for ( int i = 0; i < numberofpaths; i++ ) { // gå igenom alla våra paths tills att vi hittar
