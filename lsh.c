@@ -105,8 +105,8 @@ void RunCommand(int parse_result, Command *cmd) {
     if ( pid = fork() != 0) {
       waitpid(pid, status, options);
     } else {
-      printf("%s\n",location);
-      printf("%s\n",*cmd->pgm->pgmlist);
+      //printf("%s\n",location);
+     // printf("%s\n",*cmd->pgm->pgmlist);
     }
   
 
