@@ -108,16 +108,22 @@ void RunCommand(int parse_result, Command *cmd) {
       //printf("This is Parent I will wait for my child\n");
       waitpid(pid, status, options);
     } else {
+      printf("LENGTH LOC: %ld\n",strlen(location));
+      printf("LENGTH COM: %ld\n",strlen(*cmd->pgm->pgmlist));
 
       char* fullexec = malloc(strlen(location)+strlen(*cmd->pgm->pgmlist));
-      printf("LENGTH: %ld\n",strlen(fullexec));
+      printf("LENGTH MALLOC: %ld\n",strlen(fullexec));
 
       printf("LOCATION IS: %s\n ",location);
       printf("COMMAND IS: %s\n",*cmd->pgm->pgmlist);
 
       strcat(fullexec,location);
+      printf("LENGTH CAT LOC: %ld\n",strlen(fullexec));
       strcat(fullexec,"/");
+
+      printf("LENGTH CAT /: %ld\n",strlen(fullexec));
       strcat(fullexec,*cmd->pgm->pgmlist);
+      printf("LENGTH CAT COMMAND: %ld\n",strlen(fullexec));
       //strcat(fullexec,"\0");
 
       const char* executethis = fullexec;
