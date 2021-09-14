@@ -90,7 +90,7 @@ void RunCommand(int parse_result, Command *cmd) {
   _Bool check = 0;
   _Bool* isavailable = &check;
   const char* location = extractpath(cmd, isavailable);
-
+  printf("%s\n",location);
   if ( check ) {
 
     pid_t pid;
