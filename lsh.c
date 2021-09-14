@@ -93,7 +93,7 @@ void RunCommand(int parse_result, Command *cmd) {
   
 
   const char* location = extractpath(cmd, isavailable);
-  char* fullexec = malloc(strlen(location)+strlen(*cmd->pgm->pgmlist)+1);
+  char* fullexec = malloc(strlen(location)+strlen(*cmd->pgm->pgmlist));
 
 
 
@@ -119,7 +119,7 @@ void RunCommand(int parse_result, Command *cmd) {
       const char* executethis = fullexec;
 
       printf("FULL EXEC IS : %s\n",executethis);
-      
+
       char *argv[] = {(char*)location,NULL};
 
       execvp(fullexec,argv);
