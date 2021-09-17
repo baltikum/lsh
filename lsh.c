@@ -128,8 +128,8 @@ void RunCommand(int parse_result, Command *cmd) {
          char* fullexec = malloc(length);
 
          strcpy(fullexec,location);
-          strcat(fullexec,"/");
-          strcat(fullexec,*cmd->pgm->pgmlist);
+         strcat(fullexec,"/");
+         strcat(fullexec,*cmd->pgm->pgmlist);
 
          execvp(fullexec,cmd->pgm->pgmlist);
           //exit(0); // Behövs inte ?
@@ -144,7 +144,7 @@ void RunCommand(int parse_result, Command *cmd) {
     }
   }
 
-DebugPrintCommand(parse_result, cmd);
+//DebugPrintCommand(parse_result, cmd);
 
 }
 
