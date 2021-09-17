@@ -111,6 +111,8 @@ void RunCommand(int parse_result, Command *cmd) {
     }
   } else {
 
+   // do { Använd ihop med pipes |
+
     const char* location = extractpath(cmd, isavailable);
 
     if ( check ) {
@@ -142,6 +144,9 @@ void RunCommand(int parse_result, Command *cmd) {
     } else {
      printf("Command not available = %s\n",*cmd->pgm->pgmlist );
     }
+
+ // } while ( cmd->pgm != NULL);
+
   }
 
 //DebugPrintCommand(parse_result, cmd);
