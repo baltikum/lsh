@@ -31,6 +31,10 @@
 #include <sys/types.h>
 #include <sys/wait.h> // waitpid()
 
+
+#include <signal.h>
+
+
 #include "paths.h"
 
 #define TRUE 1
@@ -42,8 +46,13 @@ void PrintPgm(Pgm *);
 void stripwhite(char *);
 char* setcustomprompt();
 _Bool checkBuiltIn(Command * cmd);
+void signalHandler(int signal);
+void updatePrompt();
 
 int main(void) {
+
+  signal(SIGINT,signalHandler);
+
 
   Command cmd;
   int parse_result;
@@ -90,58 +99,52 @@ void RunCommand(int parse_result, Command *cmd) {
 
   _Bool check = 0;
   _Bool* isavailable = &check;
-  _Bool builtInCommand = 0;
+  _Bool builtInCommand = checkBuiltIn(cmd);
 
-  const char* location = extractpath(cmd, isavailable);
 
-  if ( !check ) {
-    builtInCommand = checkBuiltIn(cmd);
-  }
+  if ( builtInCommand ) {
+   builtInCommand = 0;
+   if (strcmp(*cmd->pgm->pgmlist,"cd") == 0 ) {
+      chdir(cmd->pgm->pgmlist[1]);
+    } else if (strcmp(*cmd->pgm->pgmlist,"exit") == 0) {
+      kill(getpid(),SIGKILL);
+    }
+  } else {
 
-  if ( check || builtInCommand ) {
+    const char* location = extractpath(cmd, isavailable);
 
-    pid_t pid = fork();
-    int* status;
-    int options = 0;
+    if ( check ) {
 
-    if ( pid < 0) {
-      printf("Error forking child");
-    } else if ( pid == 0 ){
+      pid_t pid = fork();
+      int* status;
+      int options = 0;
 
-      if ( builtInCommand ) {
-        if (strcmp(*cmd->pgm->pgmlist,"cd") == 0 ) {
-          chdir(cmd->pgm->pgmlist[1]);
-        } else if (strcmp(*cmd->pgm->pgmlist,"exit") == 0) {
-          printf("Hejsan");
-          exit(0);
-        }
-        builtInCommand = 0;
+      if ( pid < 0) {
+        printf("Error forking child.\n");
+      } else if ( pid == 0 ){
+
+         check = 0;
+         long length = (strlen(location)+1+strlen(*cmd->pgm->pgmlist));
+         char* fullexec = malloc(length);
+
+         strcpy(fullexec,location);
+          strcat(fullexec,"/");
+          strcat(fullexec,*cmd->pgm->pgmlist);
+
+         execvp(fullexec,cmd->pgm->pgmlist);
+          //exit(0); // Behövs inte ?
       } else {
-        check = 0;
-        long length = (strlen(location)+1+strlen(*cmd->pgm->pgmlist));
-        char* fullexec = malloc(length);
-
-        strcpy(fullexec,location);
-        strcat(fullexec,"/");
-        strcat(fullexec,*cmd->pgm->pgmlist);
-
-        execvp(fullexec,cmd->pgm->pgmlist);
-        //exit(0); // Behövs inte ?
-      }
+        if ( cmd->background == 0 ) {
+         waitpid(pid, status, options);
+        }
+      }  
 
     } else {
-      waitpid(pid, status, options);
+     printf("Command not available = %s\n",*cmd->pgm->pgmlist );
     }
-
-      
-
-  } else {
-    printf("Command not available = %s\n",*cmd->pgm->pgmlist );
   }
 
-
-
-  //DebugPrintCommand(parse_result, cmd);
+DebugPrintCommand(parse_result, cmd);
 
 }
 
@@ -223,6 +226,7 @@ void stripwhite(char *string)
 }
 
 char* setcustomprompt() {
+  char* prompt;
   
   char* user = getlogin();
   size_t len = 25;
@@ -236,15 +240,30 @@ char* setcustomprompt() {
     host++;
   }
   *sizedhost ='\0';
+  strcat(user,"\x1B[33m");
+  //strcat(prompt,user);
   strcat(user,"@");
   strcat(user,downsized);
   strcat(user,"--> ");
+  strcat(user,"\x1B[37m");
+
+
+ // strcat(user,"@");
+  //strcat(user,downsized);
+  //strcat(user,"--> ");
   return user;
 }
 
 _Bool checkBuiltIn(Command* cmd) {
-  _Bool cd = strcmp(*cmd->pgm->pgmlist,"cd")==0;
-  _Bool exit = strcmp(*cmd->pgm->pgmlist,"exit")==0;
+  return strcmp(*cmd->pgm->pgmlist,"cd")==0 || 
+    strcmp(*cmd->pgm->pgmlist,"exit")==0;
+}
 
-  return cd || exit;
+void signalHandler(int signal) {
+  if ( signal == SIGINT )
+    printf("SIGINT\n");
+}
+
+void updatePrompt(){
+  //New dir
 }
