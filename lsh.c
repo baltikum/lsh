@@ -41,6 +41,7 @@ void DebugPrintCommand(int, Command *);
 void PrintPgm(Pgm *);
 void stripwhite(char *);
 char* setcustomprompt();
+_Bool checkBuiltIn(Command * cmd);
 
 int main(void) {
 
@@ -89,35 +90,59 @@ void RunCommand(int parse_result, Command *cmd) {
 
   _Bool check = 0;
   _Bool* isavailable = &check;
+  _Bool builtInCommand = 0;
 
   const char* location = extractpath(cmd, isavailable);
 
-  if ( check ) {
+  if ( !check ) {
+    builtInCommand = checkBuiltIn(cmd);
+  }
 
-    pid_t pid;
+  if ( check || builtInCommand ) {
+
+    pid_t pid = fork();
     int* status;
     int options = 0;
 
-    if ( pid = fork() != 0) {
-      waitpid(pid, status, options);
+    if ( pid < 0) {
+      printf("Error forking child");
+    } else if ( pid == 0 ){
+
+      if ( builtInCommand ) {
+        if (strcmp(*cmd->pgm->pgmlist,"cd") == 0 ) {
+          chdir(cmd->pgm->pgmlist[1]);
+        } else if (strcmp(*cmd->pgm->pgmlist,"exit") == 0) {
+          printf("Hejsan");
+          exit(0);
+        }
+        builtInCommand = 0;
+      } else {
+        check = 0;
+        long length = (strlen(location)+1+strlen(*cmd->pgm->pgmlist));
+        char* fullexec = malloc(length);
+
+        strcpy(fullexec,location);
+        strcat(fullexec,"/");
+        strcat(fullexec,*cmd->pgm->pgmlist);
+
+        execvp(fullexec,cmd->pgm->pgmlist);
+        //exit(0); // Behövs inte ?
+      }
+
     } else {
-
-      long length = (strlen(location)+1+strlen(*cmd->pgm->pgmlist));
-      char* fullexec = malloc(length);
-
-      strcpy(fullexec,location);
-      strcat(fullexec,"/");
-      strcat(fullexec,*cmd->pgm->pgmlist);
-
-      execvp(fullexec,cmd->pgm->pgmlist);
-
+      waitpid(pid, status, options);
     }
 
+      
 
   } else {
     printf("Command not available = %s\n",*cmd->pgm->pgmlist );
   }
+
+
+
   //DebugPrintCommand(parse_result, cmd);
+
 }
 
 /* 
@@ -215,4 +240,11 @@ char* setcustomprompt() {
   strcat(user,downsized);
   strcat(user,"--> ");
   return user;
+}
+
+_Bool checkBuiltIn(Command* cmd) {
+  _Bool cd = strcmp(*cmd->pgm->pgmlist,"cd")==0;
+  _Bool exit = strcmp(*cmd->pgm->pgmlist,"exit")==0;
+
+  return cd || exit;
 }

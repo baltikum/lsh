@@ -47,27 +47,14 @@ const char* extractpath(Command *cmd, _Bool* isavailable) {
 				char* pointer = dirpointer->d_name;
 				char* pointer2 = commandtosearchfor;
 
-				long pointerlength = strlen(pointer);
-
-				if ( commandlength == pointerlength) { // Fortsätt om de är lika långa
-					long k = 0;
-
-					while ( *pointer == *pointer2 ) { // Kolla char för char, k<command för att pekarna
-						k++;
-						pointer++;
-						pointer2++;
-
-						if ( k == (commandlength) ) { // +1 ??? varför ?Kollar om det är matchning
-							*isavailable = 1;
-							char* temp = malloc(strlen(retrievedpath));
-							strcpy(temp,retrievedpath);
-							return temp;
-							closedir(dir);
-						};
-					};
+				if ( strcmp(pointer,pointer2) == 0 ) {
+					*isavailable = 1;
+					char* temp = malloc(strlen(retrievedpath));
+					strcpy(temp,retrievedpath);
+					closedir(dir);
+					return temp;	
 				};
 			};
-
 			closedir(dir);// Stäng öppnat directory
 		};
 	};
