@@ -39,19 +39,29 @@
 
 #define TRUE 1
 #define FALSE 0
+#define KYEL  "\x1B[33m"
+#define RED   "\x1B[31m"
+#define MAG   "\x1B[35m"
+#define RESET "\x1B[0m"
 
 void RunCommand(int, Command *);
 void DebugPrintCommand(int, Command *);
 void PrintPgm(Pgm *);
 void stripwhite(char *);
+
 char* setcustomprompt();
-_Bool checkBuiltIn(Command * cmd);
-void signalHandler(int signal);
+
+_Bool checkBuiltIn(char* cmd);
+void sig_handler(int signum );
 void updatePrompt();
+
+
+    
 
 int main(void) {
 
-  signal(SIGINT,signalHandler);
+  signal(SIGINT,sig_handler);
+
 
 
   Command cmd;
@@ -60,6 +70,8 @@ int main(void) {
   char* prompt = setcustomprompt();
 
   while (TRUE) {
+
+    
 
     char *line;
     line = readline(prompt);
@@ -73,8 +85,7 @@ int main(void) {
     /* Remove leading and trailing whitespace from the line */
     stripwhite(line);
     /* If stripped line not blank */
-    if (*line)
-    {
+    if (*line) {
       add_history(line);
       parse_result = parse(line, &cmd);
       RunCommand(parse_result, &cmd);
@@ -95,63 +106,143 @@ int main(void) {
  * 1. Implement this function so that it executes the given command(s).
  * 2. Remove the debug printing before the final submission.
  */
+int runChild(Pgm* pgm,_Bool inBackground) {
+    int res = 0;
+    pid_t pid = fork();
+    //signal(SIGINT,signalHandler);
+    int* status;
+    int options = 0;
+    if (pid < 0) {
+      printf("Error forking child.\n");
+    } else if ( pid == 0 ) {
+      printf("%d",res);
+      int res = execvp(pgm->pgmlist[0],pgm->pgmlist);
+
+      exit(res); // om det kraschar
+
+    } else {
+      if ( inBackground == 0 ) {
+       // waitpid(pid, status, options);
+        wait(NULL);
+      }
+    }
+  
+  return res;
+}
+
+void runPipedProcesses(Pgm* pgm,_Bool inBackground,_Bool first, int fileDescriptor) { 
+
+  int saved;
+  if ( first ) { // Spara undan orginal STDOUT ??
+    saved = dup(1);
+  }
+
+    int pipe1[2];
+    pipe(pipe1);
+
+  _Bool last = 0;
+
+   if ( pgm->next == NULL ) {
+      last = 1;
+   }
+
+  pid_t pid = fork();
+  int* status;
+  int options = 0;
+
+
+  if (pid < 0) {
+      printf("Error forking child.\n");
+    } else if ( pid == 0 ) {
+      printf("%s\n",pgm->pgmlist[0]);
+
+      if ( first ) {
+        printf("first CHILD\n");
+        close(pipe1[0]); // Stänger read end
+        dup2(pipe1[1], STDOUT_FILENO); // Ersätter stdout med write end out1 in 0
+        close(pipe1[1]);
+
+      } else if ( last ) {
+
+        printf("last CHILD\n");
+          close(pipe1[0]); // stäng read end
+          close(pipe1[1]); // stäng write end 
+          dup2(fileDescriptor, STDIN_FILENO); // Ersätt STDIN med pipe vidareskickat in ?
+          dup2(STDOUT_FILENO, saved); // Återställ std out ???
+          
+
+      } else {
+        printf("middle CHILD\n");
+          close(pipe1[0]); // stäng read end 
+          dup2(fileDescriptor, STDIN_FILENO); // Ersätt STDIN med pipe vidareskickat in ?
+          dup2(pipe1[1], STDOUT_FILENO);  // ersätt STDOUT med pipe write till parent
+          close(pipe1[1]);
+     
+      }
+        int res = runChild(pgm, inBackground);
+
+    } else {
+          close(pipe1[1]); // Stänger write-end
+          int vidare = dup2(pipe1[0], STDIN_FILENO); // Ersätter stdin med read end
+          close(pipe1[0]);
+
+        if ( pgm->next != NULL ) {
+          runPipedProcesses(pgm->next,inBackground,0, vidare ); // kallar på nästa kommando med vidare file descriptor
+        } else {
+          if ( inBackground == 0 ) {
+            waitpid(pid, status, options);
+        }
+
+        }
+
+    }
+
+}
+
+
+
+
 void RunCommand(int parse_result, Command *cmd) {
 
-  _Bool check = 0;
-  _Bool* isavailable = &check;
-  _Bool builtInCommand = checkBuiltIn(cmd);
+    _Bool piped = 0;
 
+    if ( cmd->pgm->next != NULL) {
+      piped = 1;
+    }
+
+
+  int res = 0;
+  _Bool builtInCommand = checkBuiltIn(*cmd->pgm->pgmlist);
 
   if ( builtInCommand ) {
-   builtInCommand = 0;
-   if (strcmp(*cmd->pgm->pgmlist,"cd") == 0 ) {
-      chdir(cmd->pgm->pgmlist[1]);
+    builtInCommand = 0;
+    if (strcmp(*cmd->pgm->pgmlist,"cd") == 0 ) {
+      res = chdir(cmd->pgm->pgmlist[1]);
     } else if (strcmp(*cmd->pgm->pgmlist,"exit") == 0) {
       kill(getpid(),SIGKILL);
     }
   } else {
 
-   // do { Använd ihop med pipes |
 
-    const char* location = extractpath(cmd, isavailable);
 
-    if ( check ) {
-
-      pid_t pid = fork();
-      int* status;
-      int options = 0;
-
-      if ( pid < 0) {
-        printf("Error forking child.\n");
-      } else if ( pid == 0 ){
-
-         check = 0;
-         long length = (strlen(location)+1+strlen(*cmd->pgm->pgmlist));
-         char* fullexec = malloc(length);
-
-         strcpy(fullexec,location);
-         strcat(fullexec,"/");
-         strcat(fullexec,*cmd->pgm->pgmlist);
-
-         execvp(fullexec,cmd->pgm->pgmlist);
-          //exit(0); // Behövs inte ?
-      } else {
-        if ( cmd->background == 0 ) {
-         waitpid(pid, status, options);
-        }
-      }  
-
+    if ( piped ) {
+      runPipedProcesses(cmd->pgm, cmd->background,1,0);
     } else {
-     printf("Command not available = %s\n",*cmd->pgm->pgmlist );
+      runChild(cmd->pgm, cmd->background);
     }
-
- // } while ( cmd->pgm != NULL);
-
   }
 
-//DebugPrintCommand(parse_result, cmd);
+
+    //do {
+    //  runNextPgm(point,cmd->background,piped);
+    //  point = point->next;
+   // } while (point != NULL);
+
+    //DebugPrintCommand(parse_result, cmd);
 
 }
+
+
 
 /* 
  * Print a Command structure as returned by parse on stdout. 
@@ -179,14 +270,12 @@ void DebugPrintCommand(int parse_result, Command *cmd)
  * 
  * Helper function, no need to change. Might be useful to study as inpsiration.
  */
-void PrintPgm(Pgm *p)
-{
-  if (p == NULL)
-  {
+void PrintPgm(Pgm *p) {
+  if (p == NULL){
     return;
-  }
-  else
-  {
+  } else {
+
+
     char **pl = p->pgmlist;
 
     /* The list is in reversed order so print
@@ -245,30 +334,39 @@ char* setcustomprompt() {
     host++;
   }
   *sizedhost ='\0';
-  strcat(user,"\x1B[33m");
+  strcat(user,KYEL);
   //strcat(prompt,user);
   strcat(user,"@");
   strcat(user,downsized);
+  strcat(user,RED);
   strcat(user,"--> ");
-  strcat(user,"\x1B[37m");
+  strcat(user,RESET);
 
 
  // strcat(user,"@");
   //strcat(user,downsized);
   //strcat(user,"--> ");
-  return user;
+ return user;
+
+  //prompt = newPrompt;
 }
 
-_Bool checkBuiltIn(Command* cmd) {
-  return strcmp(*cmd->pgm->pgmlist,"cd")==0 || 
-    strcmp(*cmd->pgm->pgmlist,"exit")==0;
-}
+_Bool checkBuiltIn(char* cmd) { return strcmp(cmd,"cd")==0 || strcmp(cmd,"exit")==0; }
 
-void signalHandler(int signal) {
-  if ( signal == SIGINT )
-    printf("SIGINT\n");
+void sig_handler(int signum) {
+  if ( signum == SIGINT ){
+
+
+   // printf("SIGINT\n"); // SIGINT Behöver ej hanteras
+  }
 }
 
 void updatePrompt(){
-  //New dir
+  char* buff = malloc(1024);
+  getcwd(buff, 1024);
+  //printf("%ld\n",strlen(buff));
+  printf("%s\n",buff);
 }
+
+
+
