@@ -49,14 +49,16 @@ void DebugPrintCommand(int, Command *);
 void PrintPgm(Pgm *);
 void stripwhite(char *);
 
-char* setcustomprompt();
 
+char* setcustomprompt();
 _Bool checkBuiltIn(char* cmd);
 void sig_handler(int signum );
 void updatePrompt();
+void runPipedProcesses(Pgm *pgm, int savedin,char* lastcmd);
 
 
-    
+
+
 
 int main(void) {
 
@@ -97,151 +99,115 @@ int main(void) {
   return 0;
 }
 
+/*
+*Runs one command as a child. Background or not
+*/
+void runChild(Pgm* pgm,_Bool inBackground) {
 
-/* Execute the given command(s).
-
- * Note: The function currently only prints the command(s).
- * 
- * TODO: 
- * 1. Implement this function so that it executes the given command(s).
- * 2. Remove the debug printing before the final submission.
- */
-int runChild(Pgm* pgm,_Bool inBackground) {
-    int res = 0;
     pid_t pid = fork();
-    //signal(SIGINT,signalHandler);
     int* status;
     int options = 0;
     if (pid < 0) {
       printf("Error forking child.\n");
     } else if ( pid == 0 ) {
-      printf("%d",res);
       int res = execvp(pgm->pgmlist[0],pgm->pgmlist);
-
       exit(res); // om det kraschar
-
     } else {
       if ( inBackground == 0 ) {
-       // waitpid(pid, status, options);
-        wait(NULL);
+        waitpid(pid, status, options);
       }
     }
+}
+
+
+
+/*
+* Runs commands recursive piping the data until last command.
+* savedin is used to restore the standard out since we modified the parent.
+* lastcmd is the last command to execute.
+*
+*/
+void runPipedProcesses(Pgm *pgm, int savedin, char* lastcmd) {
   
-  return res;
-}
+  if (pgm == NULL){
+    return;
+  } else {
 
-void runPipedProcesses(Pgm* pgm,_Bool inBackground,_Bool first, int fileDescriptor) { 
+    int last = 0;
 
-  int saved;
-  if ( first ) { // Spara undan orginal STDOUT ??
-    saved = dup(1);
-  }
-
-    int pipe1[2];
-    pipe(pipe1);
-
-  _Bool last = 0;
-
-   if ( pgm->next == NULL ) {
+    runPipedProcesses(pgm->next,savedin,lastcmd);
+    
+    if ( strcmp(pgm->pgmlist[0],lastcmd)==0 ){
       last = 1;
-   }
-
-  pid_t pid = fork();
-  int* status;
-  int options = 0;
-
-
-  if (pid < 0) {
-      printf("Error forking child.\n");
-    } else if ( pid == 0 ) {
-      printf("%s\n",pgm->pgmlist[0]);
-
-      if ( first ) {
-        printf("first CHILD\n");
-        close(pipe1[0]); // Stänger read end
-        dup2(pipe1[1], STDOUT_FILENO); // Ersätter stdout med write end out1 in 0
-        close(pipe1[1]);
-
-      } else if ( last ) {
-
-        printf("last CHILD\n");
-          close(pipe1[0]); // stäng read end
-          close(pipe1[1]); // stäng write end 
-          dup2(fileDescriptor, STDIN_FILENO); // Ersätt STDIN med pipe vidareskickat in ?
-          dup2(STDOUT_FILENO, saved); // Återställ std out ???
-          
-
-      } else {
-        printf("middle CHILD\n");
-          close(pipe1[0]); // stäng read end 
-          dup2(fileDescriptor, STDIN_FILENO); // Ersätt STDIN med pipe vidareskickat in ?
-          dup2(pipe1[1], STDOUT_FILENO);  // ersätt STDOUT med pipe write till parent
-          close(pipe1[1]);
-     
-      }
-        int res = runChild(pgm, inBackground);
-
-    } else {
-          close(pipe1[1]); // Stänger write-end
-          int vidare = dup2(pipe1[0], STDIN_FILENO); // Ersätter stdin med read end
-          close(pipe1[0]);
-
-        if ( pgm->next != NULL ) {
-          runPipedProcesses(pgm->next,inBackground,0, vidare ); // kallar på nästa kommando med vidare file descriptor
-        } else {
-          if ( inBackground == 0 ) {
-            waitpid(pid, status, options);
-        }
-
-        }
-
     }
 
-}
+    int pipet[2];
+    pipe(pipet);
 
+
+    int* status;
+    int options = 0;
+    pid_t pid = fork();
+
+    if ( pid < 0 ) {
+      printf("ERROR");
+    } else if ( pid == 0 ) {
+          close(pipet[0]);
+          if ( !last) {
+            dup2(pipet[1], 1); // Sista gågen låter vi stdout gå till terminalen istället för pipe
+          }
+          close(pipet[1]);
+          int res = execvp(pgm->pgmlist[0],pgm->pgmlist);
+          exit(res);
+    } else {
+          close(pipet[1]);
+          if (!last) {
+            dup2(pipet[0], 0);
+          } else {
+            dup2(savedin,0); // återställ stdin i parent
+            close(savedin);
+          }
+          close(pipet[0]);
+          waitpid(pid, status, options);
+    }
+  }
+}
 
 
 
 void RunCommand(int parse_result, Command *cmd) {
 
-    _Bool piped = 0;
-
-    if ( cmd->pgm->next != NULL) {
-      piped = 1;
-    }
-
-
-  int res = 0;
   _Bool builtInCommand = checkBuiltIn(*cmd->pgm->pgmlist);
 
   if ( builtInCommand ) {
+
     builtInCommand = 0;
     if (strcmp(*cmd->pgm->pgmlist,"cd") == 0 ) {
-      res = chdir(cmd->pgm->pgmlist[1]);
+      if ( chdir(cmd->pgm->pgmlist[1]) == -1 ) {
+        printf("Error changing directory.\n");
+      } else {
+        updatePrompt();
+      }
     } else if (strcmp(*cmd->pgm->pgmlist,"exit") == 0) {
       kill(getpid(),SIGKILL);
     }
+
+
   } else {
 
 
 
-    if ( piped ) {
-      runPipedProcesses(cmd->pgm, cmd->background,1,0);
+    if ( cmd->pgm->next != NULL ) {
+      int savedin = dup(0);
+      runPipedProcesses(cmd->pgm,savedin,cmd->pgm->pgmlist[0]);
     } else {
       runChild(cmd->pgm, cmd->background);
     }
+
+
   }
-
-
-    //do {
-    //  runNextPgm(point,cmd->background,piped);
-    //  point = point->next;
-   // } while (point != NULL);
-
-    //DebugPrintCommand(parse_result, cmd);
-
+   // DebugPrintCommand(parse_result, cmd);
 }
-
 
 
 /* 
@@ -249,8 +215,7 @@ void RunCommand(int parse_result, Command *cmd) {
  * 
  * Helper function, no need to change. Might be useful to study as inpsiration.
  */
-void DebugPrintCommand(int parse_result, Command *cmd)
-{
+void DebugPrintCommand(int parse_result, Command *cmd){
   if (parse_result != 1) {
     printf("Parse ERROR\n");
     return;
