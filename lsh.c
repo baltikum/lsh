@@ -32,6 +32,10 @@
 #include <sys/wait.h> // waitpid()
 
 
+
+#include <fcntl.h> // open()
+
+
 #include <signal.h>
 
 
@@ -55,6 +59,7 @@ _Bool checkBuiltIn(char* cmd);
 void sig_handler(int signum );
 void updatePrompt();
 void runPipedProcesses(Pgm *pgm, int savedin,char* lastcmd);
+void standardInput(Command* cmd);
 
 
 
@@ -63,8 +68,6 @@ void runPipedProcesses(Pgm *pgm, int savedin,char* lastcmd);
 int main(void) {
 
   signal(SIGINT,sig_handler);
-
-
 
   Command cmd;
   int parse_result;
@@ -103,10 +106,11 @@ int main(void) {
 *Runs one command as a child. Background or not
 */
 void runChild(Pgm* pgm,_Bool inBackground) {
-
-    pid_t pid = fork();
+    
     int* status;
     int options = 0;
+    pid_t pid = fork();
+    
     if (pid < 0) {
       printf("Error forking child.\n");
     } else if ( pid == 0 ) {
@@ -196,17 +200,70 @@ void RunCommand(int parse_result, Command *cmd) {
   } else {
 
 
-
-    if ( cmd->pgm->next != NULL ) {
-      int savedin = dup(0);
-      runPipedProcesses(cmd->pgm,savedin,cmd->pgm->pgmlist[0]);
+    if ( cmd->rstdin!= NULL || cmd->rstdout!=NULL ) {
+      standardInput(cmd);
     } else {
-      runChild(cmd->pgm, cmd->background);
+
+      if ( cmd->pgm->next != NULL ) {
+        int savedin = dup(0);
+        runPipedProcesses(cmd->pgm,savedin,cmd->pgm->pgmlist[0]);
+      } else {
+        runChild(cmd->pgm, cmd->background);
+      }
+
     }
 
-
   }
-   // DebugPrintCommand(parse_result, cmd);
+  //DebugPrintCommand(parse_result, cmd);
+}
+void standardInput(Command * cmd) {
+  
+  int fileDescIn;
+  int fileDescOut;
+
+  if ( cmd->rstdin != NULL ) {
+   fileDescIn = open(cmd->rstdin,0,O_RDONLY); //O_PATH skall ge en filedescriptor FLAGGA,,,,, O_RDONLY är mode WRONLY, RDWR
+  }
+  
+  if ( cmd->rstdout != NULL ) {
+    fileDescOut = open(cmd->rstdout,O_RDWR|O_CREAT|O_APPEND,0664);
+  }
+
+  int* status;
+  int options = 0;
+  pid_t pid = fork();
+
+    if ( pid < 0 ) {
+      printf("ERROR FORKING");
+    } else if ( pid == 0 ) {
+
+      if ( cmd->rstdin != NULL ) {
+        dup2(fileDescIn,0);
+      }
+
+      if ( cmd->rstdout != NULL ) {
+        dup2(fileDescOut,1);
+      }
+
+      int res =execvp(cmd->pgm->pgmlist[0],cmd->pgm->pgmlist);
+      exit(res);
+
+
+    } else {
+
+
+      if (!cmd->background) {
+        waitpid(pid,status,options);
+      }
+
+      if ( cmd->rstdin != NULL ) {
+        close(fileDescOut);
+      }
+
+      if ( cmd->rstdout != NULL ) {
+        close(fileDescIn);
+      }
+    }
 }
 
 
