@@ -23,23 +23,12 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "parse.h"
-
 #include<unistd.h> //execvp()
-
-
-
 #include <sys/types.h>
 #include <sys/wait.h> // waitpid()
-
-
-
 #include <fcntl.h> // open()
-
-
 #include <signal.h>
-
-
-#include "paths.h"
+#include "paths.h" // Används ej längre
 
 #define TRUE 1
 #define FALSE 0
@@ -67,26 +56,37 @@ char* setCustomPrompt(char* cwd);
 char* getCurrentWorkingDir();
 
 
-void signalHandler(int sig) {
-  signal(SIGINT, signalHandler);
-  signal(SIGCHLD, signalHandler);
-  printf("MAINhandler\n");
+/*
+*
+*           struct sigaction {
+               void     (*sa_handler)(int);
+               void     (*sa_sigaction)(int, siginfo_t *, void *);
+               sigset_t   sa_mask;
+               int        sa_flags;
+               void     (*sa_restorer)(void);
+           };
+
+*
+*
+*
+*/
+static void actionMain (int sig, siginfo_t *siginfo, void *context) {
+  printf ("Sending PID: %ld, UID: %ld\n", (long)siginfo->si_pid, (long)siginfo->si_uid);
 }
-void signalHandlerChild(int sig) {
-  signal(SIGINT, signalHandlerChild);
-  signal(SIGCHLD, signalHandlerChild);
-  printf("Childhandler\n");
-}
-void signalHandlerParent(int sig) {
-  signal(SIGINT, signalHandlerParent);
-  signal(SIGCHLD, signalHandlerParent);
-  printf("parenthandler\n");
+
+
+static void actionChild (int sig, siginfo_t *siginfo, void *context) {
+  printf ("Sending PID: %ld, UID: %ld\n", (long)siginfo->si_pid, (long)siginfo->si_uid);
+  kill(getpid(),SIGKILL);
 }
 
 int main(void) {
 
-  signal(SIGINT, signalHandler);
-  signal(SIGCHLD, signalHandler);
+  struct sigaction mainAct;
+  memset (&mainAct, '\0', sizeof(mainAct));
+  mainAct.sa_sigaction = &actionMain;
+  mainAct.sa_flags = SA_SIGINFO;
+  sigaction(SIGINT, &mainAct, NULL);
 
   Command cmd;
   int parse_result;
@@ -125,6 +125,8 @@ int main(void) {
 *Runs one command as a child. Background or not
 */
 void runChild(Pgm* pgm,_Bool inBackground) {
+  
+
 
     
     int* status;
@@ -134,14 +136,21 @@ void runChild(Pgm* pgm,_Bool inBackground) {
     if (pid < 0) {
       printf("Error forking child.\n");
     } else if ( pid == 0 ) {
-      signal(SIGINT, signalHandlerChild);
-      signal(SIGCHLD, signalHandlerChild);
+        
+        if ( inBackground ) {
+          signal(SIGINT,SIG_IGN);
+        } else {
+          struct sigaction childAct;
+          memset (&childAct, '\0', sizeof(childAct));
+          childAct.sa_sigaction = &actionChild;
+          childAct.sa_flags = SA_SIGINFO;
+          sigaction(SIGINT, &childAct, NULL);
+        }
+
       int res = execvp(pgm->pgmlist[0],pgm->pgmlist);
       exit(res); // om det kraschar
     } else {
 
-      signal(SIGCHLD, signalHandlerParent);
-      signal(SIGINT, signalHandlerParent);
       if ( inBackground == 0 ) {
         waitpid(pid, status, options);
       }

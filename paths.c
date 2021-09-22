@@ -58,12 +58,4 @@ const char* extractpath(Command *cmd, _Bool* isavailable) {
 			closedir(dir);// Stäng öppnat directory
 		};
 	};
-
-
-
-
-
-
-
-
 };
