@@ -47,12 +47,14 @@ char* setCustomPrompt(char* cwd);
 char* getCurrentWorkingDir();
 _Bool checkBuiltIn(char* cmd);
 
+pid_t pid = -1;
 
 static void actionMain (int sig, siginfo_t *siginfo, void *context) {}
 
-static void actionChild (int sig, siginfo_t *siginfo, void *context) {
-  kill(getpid(),SIGKILL);
+void killChild(int sig) {
+  kill(pid,SIGTERM);
 }
+
 
 int main(void) {
 
@@ -97,29 +99,17 @@ int main(void) {
 *Runs one command as a child. Background or not
 */
 void runChild(Pgm* pgm,_Bool inBackground) {
-
     int* status;
     int options = 0;
-    pid_t pid = fork();
+    pid = fork();
     
     if (pid < 0) {
       printf("Error forking child.\n");
     } else if ( pid == 0 ) {
-        
-        if ( inBackground ) {
-          signal(SIGINT,SIG_IGN);
-        } else {
-          struct sigaction childAct;
-          memset (&childAct, '\0', sizeof(childAct));
-          childAct.sa_sigaction = &actionChild;
-          childAct.sa_flags = SA_SIGINFO;
-          sigaction(SIGINT, &childAct, NULL);
-        }
       int res = execvp(pgm->pgmlist[0],pgm->pgmlist);
       printf("Command not available, try installing it.\n");
       exit(res);
     } else {
-
       if ( inBackground == 0 ) {
         waitpid(pid, status, options);
       }
@@ -184,7 +174,12 @@ void runPipedProcesses(Pgm *pgm, int savedin, char* lastcmd) {
 
 
 void RunCommand(int parse_result, Command *cmd) {
-
+  if ( cmd->background == 0 ) {
+    signal(SIGINT,killChild);
+  } else {
+    signal(SIGINT,SIG_IGN);
+    signal(SIGCHLD,SIG_IGN); // För när child är färdig.
+  }
 
   _Bool builtInCommand = checkBuiltIn(*cmd->pgm->pgmlist);
 
@@ -197,7 +192,7 @@ void RunCommand(int parse_result, Command *cmd) {
       }
 
     } else if (strcmp(*cmd->pgm->pgmlist,"exit") == 0) {
-      kill(getpid(),SIGKILL);
+      kill(getpid(),SIGTERM); //SIGKILL
     }
 
 
@@ -215,7 +210,6 @@ void RunCommand(int parse_result, Command *cmd) {
           runChild(cmd->pgm, cmd->background);
         }
       }
-    
   //DebugPrintCommand(parse_result, cmd);
   }
 }
