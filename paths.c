@@ -33,11 +33,10 @@ const char* extractpath(Command *cmd, _Bool* isavailable) {
 	for ( int j = 0; j < i; j++ ) { // Använder förra i då den har koll på mängden paths
 
 		const char* retrievedpath = spaths[j];
-
 		dir = opendir(retrievedpath);
 
 		if ( dir == NULL ) {
-			//printf("Couldnt open path directory.\n"); trol ej behörig att titta i 2 dir ställer ut felmed
+
 		} else {
 			
 			struct dirent *dirpointer; // directory entry struct
@@ -48,11 +47,7 @@ const char* extractpath(Command *cmd, _Bool* isavailable) {
 				char* pointer2 = commandtosearchfor;
 
 				if ( strcmp(pointer,pointer2) == 0 ) {
-					*isavailable = 1;
-					char* temp = malloc(strlen(retrievedpath));
-					strcpy(temp,retrievedpath);
-					closedir(dir);
-					return temp;	
+					return pointer;	
 				};
 			};
 			closedir(dir);// Stäng öppnat directory

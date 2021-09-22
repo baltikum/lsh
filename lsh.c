@@ -28,13 +28,12 @@
 #include <sys/wait.h> // waitpid()
 #include <fcntl.h> // open()
 #include <signal.h>
-#include "paths.h" // Används ej längre
+
 
 #define TRUE 1
 #define FALSE 0
 
 #define YELLOW  "\x1B[33m"
-#define RED   "\x1B[31m"
 #define MAGENTA   "\x1B[35m"
 #define RESET "\x1B[0m"
 
@@ -42,41 +41,16 @@ void RunCommand(int, Command *);
 void DebugPrintCommand(int, Command *);
 void PrintPgm(Pgm *);
 void stripwhite(char *);
-
-
-char* setcustomprompt();
-_Bool checkBuiltIn(char* cmd);
-void updatePrompt();
-void runPipedProcesses(Pgm *pgm, int savedin,char* lastcmd);
 void standardIO(Command* cmd);
-
-
-
+void runPipedProcesses(Pgm *pgm, int savedin,char* lastcmd);
 char* setCustomPrompt(char* cwd);
 char* getCurrentWorkingDir();
+_Bool checkBuiltIn(char* cmd);
 
 
-/*
-*
-*           struct sigaction {
-               void     (*sa_handler)(int);
-               void     (*sa_sigaction)(int, siginfo_t *, void *);
-               sigset_t   sa_mask;
-               int        sa_flags;
-               void     (*sa_restorer)(void);
-           };
-
-*
-*
-*
-*/
-static void actionMain (int sig, siginfo_t *siginfo, void *context) {
-  printf ("Sending PID: %ld, UID: %ld\n", (long)siginfo->si_pid, (long)siginfo->si_uid);
-}
-
+static void actionMain (int sig, siginfo_t *siginfo, void *context) {}
 
 static void actionChild (int sig, siginfo_t *siginfo, void *context) {
-  printf ("Sending PID: %ld, UID: %ld\n", (long)siginfo->si_pid, (long)siginfo->si_uid);
   kill(getpid(),SIGKILL);
 }
 
@@ -92,8 +66,6 @@ int main(void) {
   int parse_result;
 
   while (TRUE) {
-
-    
 
     char *line;
     char* cwd = getCurrentWorkingDir();
@@ -125,10 +97,7 @@ int main(void) {
 *Runs one command as a child. Background or not
 */
 void runChild(Pgm* pgm,_Bool inBackground) {
-  
 
-
-    
     int* status;
     int options = 0;
     pid_t pid = fork();
@@ -146,9 +115,9 @@ void runChild(Pgm* pgm,_Bool inBackground) {
           childAct.sa_flags = SA_SIGINFO;
           sigaction(SIGINT, &childAct, NULL);
         }
-
       int res = execvp(pgm->pgmlist[0],pgm->pgmlist);
-      exit(res); // om det kraschar
+      printf("Command not available, try installing it.\n");
+      exit(res);
     } else {
 
       if ( inBackground == 0 ) {
@@ -196,6 +165,7 @@ void runPipedProcesses(Pgm *pgm, int savedin, char* lastcmd) {
           }
           close(pipet[1]);
           int res = execvp(pgm->pgmlist[0],pgm->pgmlist);
+          printf("Command not available, try installing it.\n");
           exit(res);
     } else {
           close(pipet[1]);
@@ -224,9 +194,8 @@ void RunCommand(int parse_result, Command *cmd) {
     if (strcmp(*cmd->pgm->pgmlist,"cd") == 0 ) {
       if ( chdir(cmd->pgm->pgmlist[1]) == -1 ) {
         printf("Error changing directory.\n");
-      } else {
-        updatePrompt();
       }
+
     } else if (strcmp(*cmd->pgm->pgmlist,"exit") == 0) {
       kill(getpid(),SIGKILL);
     }
@@ -235,22 +204,23 @@ void RunCommand(int parse_result, Command *cmd) {
   } else {
 
 
-    if ( cmd->rstdin!= NULL || cmd->rstdout!=NULL ) {
-      standardIO(cmd);
-    } else {
-
-      if ( cmd->pgm->next != NULL ) {
-        int savedin = dup(0);
-        runPipedProcesses(cmd->pgm,savedin,cmd->pgm->pgmlist[0]);
+      if ( cmd->rstdin!= NULL || cmd->rstdout!=NULL ) {
+        standardIO(cmd);
       } else {
-        runChild(cmd->pgm, cmd->background);
+
+        if ( cmd->pgm->next != NULL ) {
+          int savedin = dup(0);
+          runPipedProcesses(cmd->pgm,savedin,cmd->pgm->pgmlist[0]);
+        } else {
+          runChild(cmd->pgm, cmd->background);
+        }
       }
-
-    }
-
-  }
+    
   //DebugPrintCommand(parse_result, cmd);
+  }
 }
+
+
 void standardIO(Command * cmd) {
 
   int fileDescIn;
@@ -280,7 +250,8 @@ void standardIO(Command * cmd) {
         dup2(fileDescOut,1);
       }
 
-      int res =execvp(cmd->pgm->pgmlist[0],cmd->pgm->pgmlist);
+      int res = execvp(cmd->pgm->pgmlist[0],cmd->pgm->pgmlist);
+      printf("Command not available, try installing it.\n");
       exit(res);
 
 
@@ -380,54 +351,24 @@ void stripwhite(char *string)
 _Bool checkBuiltIn(char* cmd) { return strcmp(cmd,"cd")==0 || strcmp(cmd,"exit")==0; }
 
 
-
-void updatePrompt(){
-  char* buff = malloc(2048);
-  getcwd(buff, 2048);
-  //printf("%s\n",buff);
-}
-
 char* getCurrentWorkingDir() {
   char* buff = malloc(2048);
   getcwd(buff, 2048);
-  //printf("%ld\n",strlen(buff));
-  //printf("%s\n",buff);
-
   return buff;
-
-
 }
 
 
 char* setCustomPrompt(char * cwd) {
-  char* prompt;
-  
-  char* user = getlogin();
-  //size_t len = 25;
-  //char* host = malloc(len); 
- // gethostname(host,len);
- // char* sizedhost = malloc(len);
- // char* downsized = sizedhost;
- // while ( *host ) {
- //   *sizedhost = *host;
- //   sizedhost++;
-  //  host++;
-  //}
- // *sizedhost ='\0';
-  strcat(user,MAGENTA);
-  //strcat(prompt,user);
-  strcat(user," *\\\\.");
-  //strcat(user,downsized);
-  strcat(user,YELLOW);
-  strcat(user,cwd);
-  strcat(user,"--> ");
-  strcat(user,RESET);
 
-
- // strcat(user,"@");
-  //strcat(user,downsized);
-  //strcat(user,"--> ");
- return user;
+  char* prompt = getlogin();
+  strcat(prompt,MAGENTA);
+  strcat(prompt,"||");
+  strcat(prompt,YELLOW);
+  strcat(prompt,".");
+  strcat(prompt,cwd);
+  strcat(prompt,"--> ");
+  strcat(prompt,RESET);
+  return prompt;
 
 }
 
