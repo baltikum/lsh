@@ -4,8 +4,8 @@
 #
 BIN=	lsh
 
-SRCS=	parse.c lsh.c paths.c
-OBJS=	parse.o lsh.o paths.c
+SRCS=	parse.c lsh.c
+OBJS=	parse.o lsh.o
 
 CC=	gcc
 CFLAGS= -g 

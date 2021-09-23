@@ -1,20 +1,3 @@
-/* 
- * Main source code file for lsh shell program
- *
- * You are free to add functions to this file.
- * If you want to add functions in a separate file 
- * you will need to modify Makefile to compile
- * your additional functions.
- *
- * Add appropriate comments in your code to make it
- * easier for us while grading your assignment.
- *
- * Submit the entire lab1 folder as a tar archive (.tgz).
- * Command to create submission archive: 
-      $> tar cvf lab1.tgz lab1/
- *
- * All the best 
- */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,10 +6,10 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "parse.h"
-#include<unistd.h> //execvp()
+#include<unistd.h>
 #include <sys/types.h>
-#include <sys/wait.h> // waitpid()
-#include <fcntl.h> // open()
+#include <sys/wait.h> 
+#include <fcntl.h>
 #include <signal.h>
 
 
@@ -74,30 +57,24 @@ int main(void) {
     char* prompt = setCustomPrompt(cwd);
     line = readline(prompt);
 
-    /* If EOF encountered, exit shell */
     if (!line) {
       break;
     }
 
 
-    /* Remove leading and trailing whitespace from the line */
     stripwhite(line);
-    /* If stripped line not blank */
     if (*line) {
       add_history(line);
       parse_result = parse(line, &cmd);
       RunCommand(parse_result, &cmd);
     }
 
-    /* Clear memory */
     free(line);
   }
   return 0;
 }
 
-/*
-*Runs one command as a child. Background or not
-*/
+
 void runChild(Pgm* pgm,_Bool inBackground) {
     int* status;
     int options = 0;
@@ -118,12 +95,7 @@ void runChild(Pgm* pgm,_Bool inBackground) {
 
 
 
-/*
-* Runs commands recursive piping the data until last command.
-* savedin is used to restore the standard out since we modified the parent.
-* lastcmd is the last command to execute.
-*
-*/
+
 void runPipedProcesses(Pgm *pgm, int savedin, char* lastcmd) {
   
   if (pgm == NULL){
@@ -151,7 +123,7 @@ void runPipedProcesses(Pgm *pgm, int savedin, char* lastcmd) {
     } else if ( pid == 0 ) {
           close(pipet[0]);
           if ( !last) {
-            dup2(pipet[1], 1); // Sista gågen låter vi stdout gå till terminalen istället för pipe
+            dup2(pipet[1], 1);
           }
           close(pipet[1]);
           int res = execvp(pgm->pgmlist[0],pgm->pgmlist);
@@ -162,7 +134,7 @@ void runPipedProcesses(Pgm *pgm, int savedin, char* lastcmd) {
           if (!last) {
             dup2(pipet[0], 0);
           } else {
-            dup2(savedin,0); // återställ stdin i parent
+            dup2(savedin,0);
             close(savedin);
           }
           close(pipet[0]);
@@ -178,7 +150,7 @@ void RunCommand(int parse_result, Command *cmd) {
     signal(SIGINT,killChild);
   } else {
     signal(SIGINT,SIG_IGN);
-    signal(SIGCHLD,SIG_IGN); // För när child är färdig.
+    signal(SIGCHLD,SIG_IGN);
   }
 
   _Bool builtInCommand = checkBuiltIn(*cmd->pgm->pgmlist);
@@ -192,7 +164,7 @@ void RunCommand(int parse_result, Command *cmd) {
       }
 
     } else if (strcmp(*cmd->pgm->pgmlist,"exit") == 0) {
-      kill(getpid(),SIGTERM); //SIGKILL
+      kill(getpid(),SIGTERM);
     }
 
 
@@ -210,7 +182,6 @@ void RunCommand(int parse_result, Command *cmd) {
           runChild(cmd->pgm, cmd->background);
         }
       }
-  //DebugPrintCommand(parse_result, cmd);
   }
 }
 
@@ -221,7 +192,7 @@ void standardIO(Command * cmd) {
   int fileDescOut;
 
   if ( cmd->rstdin != NULL ) {
-   fileDescIn = open(cmd->rstdin,0,O_RDONLY); //O_PATH skall ge en filedescriptor FLAGGA,,,,, O_RDONLY är mode WRONLY, RDWR
+   fileDescIn = open(cmd->rstdin,0,O_RDONLY);
   }
   
   if ( cmd->rstdout != NULL ) {
@@ -267,11 +238,7 @@ void standardIO(Command * cmd) {
 }
 
 
-/* 
- * Print a Command structure as returned by parse on stdout. 
- * 
- * Helper function, no need to change. Might be useful to study as inpsiration.
- */
+
 void DebugPrintCommand(int parse_result, Command *cmd){
   if (parse_result != 1) {
     printf("Parse ERROR\n");
@@ -288,10 +255,6 @@ void DebugPrintCommand(int parse_result, Command *cmd){
 }
 
 
-/* Print a (linked) list of Pgm:s.
- * 
- * Helper function, no need to change. Might be useful to study as inpsiration.
- */
 void PrintPgm(Pgm *p) {
   if (p == NULL){
     return;
@@ -300,9 +263,6 @@ void PrintPgm(Pgm *p) {
 
     char **pl = p->pgmlist;
 
-    /* The list is in reversed order so print
-     * it reversed to get right
-     */
     PrintPgm(p->next);
     printf("            * [ ");
     while (*pl)
@@ -314,10 +274,6 @@ void PrintPgm(Pgm *p) {
 }
 
 
-/* Strip whitespace from the start and end of a string. 
- *
- * Helper function, no need to change.
- */
 void stripwhite(char *string)
 {
   register int i = 0;

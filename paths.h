@@ -1,1 +1,0 @@
-extern const char* extractpath(Command *cmd, _Bool* isavailable);

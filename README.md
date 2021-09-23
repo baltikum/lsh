@@ -1,2 +1,0 @@
-# lsh
-Shell emulator
