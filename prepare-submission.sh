@@ -1,3 +1,4 @@
+
 #!/usr/bin/env bash
 # Lab 1
 set -e
@@ -9,9 +10,8 @@ TEMPLATE_URL="https://chalmersuniversity.box.com/shared/static/5fl1c8q4vulfcadr4
 
 SUBMISSION="lab1-$(whoami)"
 TEMPLATE_NAME="lab1-template"
-REQUIRED_PATH="code/lsh.c"
+REQUIRED_PATH="lsh/lsh.c"
 
-[[ $(hostname) =~ remote1[1-2].chalmers.se ]] ||  { echo "[ERROR] You need to compile and test your program at remote11/remote12.chalmers.se before submission!"; exit 1; }
 
 cd "$script_dir"
 [[ ! -e "$REQUIRED_PATH" ]] && { echo "[ERROR] Script needs to be placed in the directory that contains: $REQUIRED_PATH"; exit 1; }
@@ -22,7 +22,7 @@ wget -q -O "${TEMPLATE_NAME}.zip" "$TEMPLATE_URL" > /dev/null
 unzip "${TEMPLATE_NAME}.zip"
 mv "$TEMPLATE_NAME" "$SUBMISSION"
 rm "${TEMPLATE_NAME}.zip"
-cp code/lsh.c "$SUBMISSION"/
+cp lsh.c "$SUBMISSION"/
 cd "$SUBMISSION"
 
 make clean > /dev/null
